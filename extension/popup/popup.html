@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="appName">DocentAI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">💡</div>
+      <h1 data-i18n="appName">DocentAI</h1>
+      <p class="tagline" data-i18n="appTagline">넷플릭스 자막 설명 도우미</p>
+    </div>
+
+    <div class="content">
+      <div class="info-box">
+        <h2 data-i18n="popup.howToUse">사용 방법</h2>
+        <ol>
+          <li data-i18n="popup.step1">넷플릭스에서 영상을 재생하세요</li>
+          <li data-i18n="popup.step2">자막 위에 마우스를 올리면 💡 버튼이 나타납니다</li>
+          <li id="step3-text">💡 버튼을 클릭하거나 <kbd>Ctrl+E</kbd> (Mac: <kbd>⌘+E</kbd>)를 누르세요</li>
+          <li data-i18n="popup.step4">AI가 자막의 맥락을 설명해드립니다</li>
+        </ol>
+      </div>
+
+      <div class="status-box">
+        <div class="status-item">
+          <span class="status-label" data-i18n="popup.statusLabel">상태:</span>
+          <span class="status-value" id="status" data-i18n="popup.statusReady">준비됨</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label" data-i18n="popup.versionLabel">버전:</span>
+          <span class="status-value">1.0.0</span>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="openOptionsBtn" class="btn btn-primary" data-i18n="popup.settingsButton">
+          ⚙️ 설정
+        </button>
+        <button id="testBtn" class="btn btn-secondary" data-i18n="popup.testButton">
+          🧪 테스트
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p data-i18n="popup.footer">더 나은 시청 경험을 위해</p>
+    </div>
+  </div>
+
+  <script src="../lib/i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

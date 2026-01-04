@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "DocentAI - Subtitle Context Explainer",
+  "version": "1.0.0",
+  "description": "넷플릭스 자막을 클릭하면 AI가 맥락을 설명해줍니다",
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+
+  "host_permissions": [
+    "https://www.netflix.com/*",
+    "http://localhost:7777/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.netflix.com/*"],
+      "js": [
+        "lib/i18n.js",
+        "lib/api-client.js",
+        "content/netflix-detector.js",
+        "content/ui-components.js",
+        "content/content.js"
+      ],
+      "css": ["content/styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["lang/*.json"],
+      "matches": ["https://www.netflix.com/*"]
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/favicon-16x16.png",
+      "48": "assets/icons/favicon-48x48.png",
+      "128": "assets/icons/favicon-128x128.png"
+    }
+  },
+
+  "options_page": "options/options.html",
+
+  "commands": {
+    "explain-current-subtitle": {
+      "suggested_key": {
+        "default": "Ctrl+E",
+        "mac": "Command+E"
+      },
+      "description": "현재 자막 설명"
+    }
+  },
+
+  "icons": {
+    "16": "assets/icons/favicon-16x16.png",
+    "48": "assets/icons/favicon-48x48.png",
+    "128": "assets/icons/favicon-128x128.png"
+  }
+}

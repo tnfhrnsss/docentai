@@ -1,0 +1,68 @@
+{
+  "appName": "DocentAI",
+  "appTagline": "넷플릭스 자막 설명 도우미",
+
+  "popup": {
+    "howToUse": "사용 방법",
+    "step1": "넷플릭스에서 영상을 재생하세요",
+    "step2": "자막 위에 마우스를 올리면 💡 버튼이 나타납니다",
+    "step3": "💡 버튼을 클릭하거나 {shortcut}를 누르세요",
+    "step4": "AI가 자막의 맥락을 설명해드립니다",
+    "shortcutWin": "Ctrl+E",
+    "shortcutMac": "⌘+E",
+    "statusLabel": "상태:",
+    "statusReady": "준비됨",
+    "statusActive": "✅ 활성화됨",
+    "statusWaiting": "⏸️ 대기 중 (넷플릭스에서만 작동)",
+    "versionLabel": "버전:",
+    "settingsButton": "⚙️ 설정",
+    "testButton": "🧪 테스트",
+    "footer": "더 나은 시청 경험을 위해",
+    "messageError": "메시지 전송 실패:",
+    "alertNetflixOnly": "넷플릭스 페이지에서 실행해주세요."
+  },
+
+  "options": {
+    "title": "DocentAI 설정",
+    "generalSettings": "일반 설정",
+    "uiSettings": "UI 설정",
+    "advancedSettings": "고급 설정",
+
+    "enableExtension": "확장 프로그램 활성화",
+    "enableExtensionDesc": "DocentAI 기능을 켜거나 끕니다",
+
+    "autoAnalyze": "자동 영상 분석",
+    "autoAnalyzeDesc": "영상 재생 시 자동으로 분석을 시작합니다",
+
+    "showFloatingButton": "플로팅 버튼 표시",
+    "showFloatingButtonDesc": "우측 하단에 💡 버튼을 표시합니다",
+
+    "showHoverIndicator": "자막 호버 인디케이터 표시",
+    "showHoverIndicatorDesc": "자막에 마우스를 올렸을 때 💡 아이콘을 표시합니다",
+
+    "useDummyData": "더미 데이터 사용 (개발 모드)",
+    "useDummyDataDesc": "실제 API 대신 더미 데이터를 사용합니다",
+
+    "apiEndpoint": "API 엔드포인트",
+    "apiEndpointDesc": "백엔드 API 서버 주소",
+
+    "saveButton": "저장",
+    "resetButton": "초기화",
+    "saveMessage": "설정이 저장되었습니다!"
+  },
+
+  "ui": {
+    "floatingButtonTitle": "현재 자막 설명 (단축키: Ctrl+E)",
+    "analyzing": "분석 중...",
+    "error": "오류가 발생했습니다.",
+    "retryAfter": "초 후 다시 시도해주세요.",
+    "noSubtitleAvailable": "현재 표시된 자막이 없습니다.",
+    "sourcesTitle": "📚 정보 출처",
+    "referencesTitle": "🔗 관련 장면",
+    "cached": "⚡ 캐시됨",
+    "newAnalysis": "🔍 신규 분석",
+    "videoAnalyzing": "영상 분석 중",
+    "pleaseWait": "잠시만 기다려주세요...",
+    "progress": "진행률"
+  }
+}

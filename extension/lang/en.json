@@ -1,0 +1,68 @@
+{
+  "appName": "DocentAI",
+  "appTagline": "Netflix Subtitle Explanation Assistant",
+
+  "popup": {
+    "howToUse": "How to Use",
+    "step1": "Play a video on Netflix",
+    "step2": "Hover over subtitles to see the 💡 button",
+    "step3": "Click the 💡 button or press {shortcut}",
+    "step4": "AI will explain the context of the subtitle",
+    "shortcutWin": "Ctrl+E",
+    "shortcutMac": "⌘+E",
+    "statusLabel": "Status:",
+    "statusReady": "Ready",
+    "statusActive": "✅ Active",
+    "statusWaiting": "⏸️ Waiting (Works only on Netflix)",
+    "versionLabel": "Version:",
+    "settingsButton": "⚙️ Settings",
+    "testButton": "🧪 Test",
+    "footer": "For a better viewing experience",
+    "messageError": "Message sending failed:",
+    "alertNetflixOnly": "Please run on Netflix page."
+  },
+
+  "options": {
+    "title": "DocentAI Settings",
+    "generalSettings": "General Settings",
+    "uiSettings": "UI Settings",
+    "advancedSettings": "Advanced Settings",
+
+    "enableExtension": "Enable Extension",
+    "enableExtensionDesc": "Turn DocentAI features on or off",
+
+    "autoAnalyze": "Auto Video Analysis",
+    "autoAnalyzeDesc": "Automatically start analysis when video plays",
+
+    "showFloatingButton": "Show Floating Button",
+    "showFloatingButtonDesc": "Display the 💡 button in the bottom right",
+
+    "showHoverIndicator": "Show Subtitle Hover Indicator",
+    "showHoverIndicatorDesc": "Display 💡 icon when hovering over subtitles",
+
+    "useDummyData": "Use Dummy Data (Dev Mode)",
+    "useDummyDataDesc": "Use dummy data instead of actual API",
+
+    "apiEndpoint": "API Endpoint",
+    "apiEndpointDesc": "Backend API server address",
+
+    "saveButton": "Save",
+    "resetButton": "Reset",
+    "saveMessage": "Settings saved successfully!"
+  },
+
+  "ui": {
+    "floatingButtonTitle": "Explain current subtitle (Shortcut: Ctrl+E)",
+    "analyzing": "Analyzing...",
+    "error": "An error occurred.",
+    "retryAfter": "Please try again after",
+    "noSubtitleAvailable": "No subtitle is currently displayed.",
+    "sourcesTitle": "📚 Sources",
+    "referencesTitle": "🔗 Related Scenes",
+    "cached": "⚡ Cached",
+    "newAnalysis": "🔍 New Analysis",
+    "videoAnalyzing": "Analyzing Video",
+    "pleaseWait": "Please wait...",
+    "progress": "Progress"
+  }
+}
