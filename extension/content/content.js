@@ -1,16 +1,7 @@
-/**
- * DocentAI - Main Content Script
- * 넷플릭스 자막 설명 Chrome Extension
- */
-
-// 전역 인스턴스
 let detector = null;
 let apiClient = null;
 let ui = null;
 
-/**
- * 초기화
- */
 async function init() {
   console.log('🚀 DocentAI 초기화 중...');
 
@@ -25,24 +16,11 @@ async function init() {
   // CSS 애니메이션 주입
   injectStyles();
 
-  ui.createFloatingButton();
+  console.log('✅ 전역 초기화 완료');
 
-  // 영상 감지 대기
-  await waitForVideoPlayer();
-
-  // 영상 메타데이터 추출
-  const metadata = await detector.detectVideo();
-  console.log('333' + metadata);
-  if (metadata) {
-    // 백엔드에 영상 등록
-    await registerVideo(metadata);
-
-    // 이벤트 리스너 설정
-    setupEventListeners();
-
-    console.log('✅ 초기화 완료');
-  } else {
-    console.error('❌ 영상 감지 실패');
+  // 현재 URL이 /watch/라면 영상 페이지 초기화
+  if (location.href.includes('/watch/')) {
+    await initVideoPage();
   }
 }
 
@@ -257,9 +235,104 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
+/**
+ * URL 변경 감지 (Netflix는 SPA이므로 필요)
+ */
+let lastUrl = location.href;
+function watchUrlChanges() {
+  console.log('👀 URL 변경 감지 시작');
+
+  function handleUrlChange() {
+    const currentUrl = location.href;
+    if (currentUrl !== lastUrl) {
+      console.log('🔄 URL 변경 감지:', lastUrl, '→', currentUrl);
+      lastUrl = currentUrl;
+
+      // /watch/ URL로 변경되었을 때 초기화
+      if (currentUrl.includes('/watch/')) {
+        initVideoPage();
+      } else {
+        // watch 페이지를 벗어나면 플로팅 버튼 제거
+        if (ui.floatingButton) {
+          ui.floatingButton.remove();
+          ui.floatingButton = null;
+          console.log('🗑️ 플로팅 버튼 제거');
+        }
+      }
+    }
+  }
+
+  // 방법 1: History API 패치
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+
+  history.pushState = function(...args) {
+    console.log('📍 pushState 호출됨');
+    originalPushState.apply(this, args);
+    handleUrlChange();
+  };
+
+  history.replaceState = function(...args) {
+    console.log('📍 replaceState 호출됨');
+    originalReplaceState.apply(this, args);
+    handleUrlChange();
+  };
+
+  // 방법 2: popstate 이벤트 (뒤로가기/앞으로가기)
+  window.addEventListener('popstate', () => {
+    console.log('📍 popstate 이벤트');
+    handleUrlChange();
+  });
+
+  // 방법 3: 주기적 체크 (fallback)
+  setInterval(() => {
+    if (location.href !== lastUrl) {
+      console.log('📍 주기적 체크로 URL 변경 감지');
+      handleUrlChange();
+    }
+  }, 1000);
+}
+
+/**
+ * 영상 페이지 초기화 (플로팅 버튼 + 이벤트 리스너)
+ */
+async function initVideoPage() {
+  console.log('🎬 영상 페이지 초기화 시도...');
+
+  // 이미 초기화되었으면 스킵
+  if (ui.floatingButton) {
+    console.log('✅ 이미 초기화됨');
+    return;
+  }
+
+  // 영상 감지 대기
+  await waitForVideoPlayer();
+
+  // 영상 메타데이터 추출
+  const metadata = await detector.detectVideo();
+
+  if (metadata) {
+    // 플로팅 버튼 생성 (영상 재생 페이지에서만)
+    ui.createFloatingButton();
+
+    // 백엔드에 영상 등록
+    await registerVideo(metadata);
+
+    // 이벤트 리스너 설정
+    setupEventListeners();
+
+    console.log('✅ 영상 페이지 초기화 완료');
+  } else {
+    console.log('❌ 영상 감지 실패');
+  }
+}
+
 // 초기화 실행
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
+
+// URL 변경 감지 시작
+watchUrlChanges();

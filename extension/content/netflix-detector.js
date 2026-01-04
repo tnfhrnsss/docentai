@@ -15,6 +15,11 @@ class NetflixDetector {
       // URL에서 videoId 추출
       const videoId = this.extractVideoIdFromURL();
 
+      if (!videoId) {
+        console.log('❌ videoId를 찾을 수 없습니다. URL:', window.location.href);
+        return null;
+      }
+
       if (videoId === this.currentVideoId) {
         return this.metadata; // 이미 감지된 영상
       }
