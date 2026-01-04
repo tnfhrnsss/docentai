@@ -25,6 +25,8 @@ async function init() {
   // CSS 애니메이션 주입
   injectStyles();
 
+  ui.createFloatingButton();
+
   // 영상 감지 대기
   await waitForVideoPlayer();
 
@@ -94,57 +96,7 @@ async function registerVideo(metadata) {
 function setupEventListeners() {
   console.log('🎧 이벤트 리스너 설정 중...');
 
-  // 1. 자막 마우스오버 감지 (💡 표시용)a
-  let subtitleHoverIndicator = null;
-
-  document.addEventListener('mousemove', (e) => {
-    // 먼저 화면에 자막이 있는지 확인
-    const subtitleContainer = document.querySelector('.player-timedtext');
-
-    console.log("subtitlecontainer :: " + subtitleContainer);
-    // 자막이 없거나 텍스트가 비어있으면 무시
-    if (!subtitleContainer || !subtitleContainer.textContent.trim()) {
-      if (subtitleHoverIndicator) {
-        subtitleHoverIndicator.remove();
-        subtitleHoverIndicator = null;
-      }
-      return;
-    }
-
-    // 자막이 있을 때: e.target이 자막 영역 안에 있는지 확인
-    const subtitleElement = document.querySelector('.player-timedtext-text-container');
-
-    if (subtitleElement) {
-      // 자막 위에 있을 때 💡 표시
-      if (!subtitleHoverIndicator) {
-        subtitleHoverIndicator = createSubtitleIndicator(subtitleElement);
-      }
-    } else {
-      // 자막 밖으로 나가면 💡 제거
-      if (subtitleHoverIndicator) {
-        subtitleHoverIndicator.remove();
-        subtitleHoverIndicator = null;
-      }
-    }
-  });
-
-  // 2. 자막 클릭 (💡 클릭)
-  document.addEventListener('click', async (e) => {
-    const indicatorClicked = e.target.id === 'subtitle-hover-indicator';
-    const subtitleElement = e.target.closest('.player-timedtext, .player-timedtext-text-container');
-
-    if (indicatorClicked || subtitleElement) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const selectedText = subtitleElement ? subtitleElement.textContent.trim() : detector.getCurrentSubtitle();
-      if (selectedText) {
-        await explainSubtitle(selectedText, e.clientX, e.clientY);
-      }
-    }
-  });
-
-  // 3. 플로팅 버튼 클릭
+  // 2. 플로팅 버튼 클릭
   ui.floatingButton.addEventListener('click', async () => {
     const currentSubtitle = detector.getCurrentSubtitle();
 
@@ -157,7 +109,7 @@ function setupEventListeners() {
     }
   });
 
-  // 4. 단축키 (Ctrl+E / ⌘+E)
+  // 3. 단축키 (Ctrl+E / ⌘+E)
   document.addEventListener('keydown', async (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
       e.preventDefault();
@@ -173,49 +125,7 @@ function setupEventListeners() {
     }
   });
 
-  // 5. 타임스탬프 이동 메시지 수신
-  window.addEventListener('message', (e) => {
-    if (e.data.type === 'SEEK_TO_TIMESTAMP') {
-      detector.seekTo(e.data.timestamp);
-      ui.showToast(`${formatTime(e.data.timestamp)}로 이동합니다.`);
-    }
-  });
-
   console.log('✅ 이벤트 리스너 설정 완료');
-}
-
-/**
- * 자막 위에 표시할 💡 인디케이터 생성
- */
-function createSubtitleIndicator(subtitleElement) {
-  const indicator = document.createElement('div');
-  indicator.id = 'subtitle-hover-indicator';
-  indicator.innerHTML = '💡';
-  indicator.title = i18n.t('ui.floatingButtonTitle');
-
-  const rect = subtitleElement.getBoundingClientRect();
-
-  indicator.style.cssText = `
-    position: fixed;
-    left: ${rect.right + 10}px;
-    top: ${rect.top}px;
-    width: 32px;
-    height: 32px;
-    background: rgba(255, 215, 0, 0.9);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 20px;
-    z-index: 9998;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
-    animation: bounce 0.5s ease-in-out infinite;
-    pointer-events: auto;
-  `;
-
-  document.body.appendChild(indicator);
-  return indicator;
 }
 
 /**
