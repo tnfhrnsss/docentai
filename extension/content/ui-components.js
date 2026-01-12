@@ -4,13 +4,12 @@
 class UIComponents {
   constructor() {
     this.currentPanel = null;
+    this.actionPanel = null;
     this.floatingButton = null;
     this.progressBar = null;
+    this.selectedImage = null;
   }
 
-  /**
-   * 플로팅 버튼 생성
-   */
   createFloatingButton() {
     if (this.floatingButton) return;
 
@@ -38,7 +37,6 @@ class UIComponents {
       animation: fadeIn 0.3s ease-out;
     `;
 
-    // 호버 효과
     button.addEventListener('mouseenter', () => {
       button.style.transform = 'scale(1.1)';
       button.style.boxShadow = '0 6px 24px rgba(255, 215, 0, 0.6)';
@@ -55,9 +53,7 @@ class UIComponents {
     return button;
   }
 
-  /**
-   * 설명 패널 생성
-   */
+
   createExplanationPanel(selectedText, x, y) {
     // 기존 패널 제거
     this.removeExplanationPanel();
@@ -168,6 +164,24 @@ class UIComponents {
     }, 100);
 
     return panel;
+  }
+
+  /**
+   * 설명 패널 상태 업데이트 (로딩 메시지 변경)
+   */
+  updateExplanationPanelStatus(status) {
+    if (!this.currentPanel) return;
+
+    const content = this.currentPanel.querySelector('.explanation-content');
+    const loadingDiv = content?.querySelector('.loading');
+
+    if (loadingDiv) {
+      // 로딩 텍스트만 업데이트
+      const textNode = Array.from(loadingDiv.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+      if (textNode) {
+        textNode.textContent = status;
+      }
+    }
   }
 
   /**
@@ -287,6 +301,405 @@ class UIComponents {
     if (this.currentPanel) {
       this.currentPanel.remove();
       this.currentPanel = null;
+    }
+  }
+
+  /**
+   * 액션 패널 생성 (이미지 첨부 UI 포함)
+   */
+  createActionPanel(selectedText, onExplain) {
+    // 기존 패널 제거
+    this.removeActionPanel();
+
+    const panel = document.createElement('div');
+    panel.id = 'subtitle-action-panel';
+
+    // 화면 중앙에 위치
+    const centerX = (window.innerWidth - 400) / 2;
+    const centerY = (window.innerHeight - 400) / 2;
+
+    panel.innerHTML = `
+      <div style="
+        position: fixed;
+        left: ${centerX}px;
+        top: ${centerY}px;
+        width: 400px;
+        background: rgba(20, 20, 20, 0.98);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        color: white;
+        z-index: 10000;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      ">
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 20px;
+        ">
+          <h3 style="
+            margin: 0;
+            font-size: 18px;
+            color: #ffd700;
+            font-weight: 600;
+          ">자막 설명 요청</h3>
+          <button class="close-btn" style="
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            transition: color 0.2s;
+          ">×</button>
+        </div>
+
+        <div style="
+          background: rgba(255, 215, 0, 0.1);
+          padding: 12px;
+          border-radius: 6px;
+          margin-bottom: 20px;
+          border-left: 3px solid #ffd700;
+        ">
+          <div style="
+            font-size: 12px;
+            color: #ffd700;
+            margin-bottom: 4px;
+          ">현재 자막</div>
+          <div style="
+            font-size: 15px;
+            color: #e0e0e0;
+          ">"${selectedText}"</div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div style="
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 12px;
+            font-weight: 500;
+          ">이미지 첨부 (선택사항)</div>
+
+          <div style="
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+          ">
+            <button id="capture-screen-btn" style="
+              flex: 1;
+              padding: 10px;
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 6px;
+              color: white;
+              cursor: pointer;
+              font-size: 13px;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+            ">
+              📸 화면 캡처
+            </button>
+            <button id="select-file-btn" style="
+              flex: 1;
+              padding: 10px;
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 6px;
+              color: white;
+              cursor: pointer;
+              font-size: 13px;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+            ">
+              📁 파일 선택
+            </button>
+          </div>
+          <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+          <div id="image-preview-container" style="
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+          ">
+            <div style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 8px;
+            ">
+              <span style="font-size: 12px; color: #999;">이미지 미리보기</span>
+              <button id="remove-image-btn" style="
+                background: none;
+                border: none;
+                color: #ff6b6b;
+                cursor: pointer;
+                font-size: 12px;
+                padding: 4px 8px;
+                border-radius: 4px;
+                transition: background 0.2s;
+              ">✕ 제거</button>
+            </div>
+            <img id="image-preview" style="
+              width: 100%;
+              border-radius: 4px;
+              display: block;
+            ">
+          </div>
+        </div>
+
+        <div style="
+          display: flex;
+          gap: 8px;
+        ">
+          <button id="cancel-btn" style="
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+          ">취소</button>
+          <button id="explain-btn" style="
+            flex: 2;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+          ">💡 설명 요청</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(panel);
+    this.actionPanel = panel;
+
+    // 버튼 호버 효과
+    const captureBtn = panel.querySelector('#capture-screen-btn');
+    const selectFileBtn = panel.querySelector('#select-file-btn');
+    const explainBtn = panel.querySelector('#explain-btn');
+    const cancelBtn = panel.querySelector('#cancel-btn');
+    const removeImageBtn = panel.querySelector('#remove-image-btn');
+
+    [captureBtn, selectFileBtn].forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = 'rgba(255, 255, 255, 0.15)';
+        btn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.background = 'rgba(255, 255, 255, 0.1)';
+        btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+      });
+    });
+
+    explainBtn.addEventListener('mouseenter', () => {
+      explainBtn.style.transform = 'translateY(-2px)';
+      explainBtn.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.4)';
+    });
+    explainBtn.addEventListener('mouseleave', () => {
+      explainBtn.style.transform = 'translateY(0)';
+      explainBtn.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.3)';
+    });
+
+    cancelBtn.addEventListener('mouseenter', () => {
+      cancelBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+      cancelBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+    });
+
+    removeImageBtn.addEventListener('mouseenter', () => {
+      removeImageBtn.style.background = 'rgba(255, 107, 107, 0.2)';
+    });
+    removeImageBtn.addEventListener('mouseleave', () => {
+      removeImageBtn.style.background = 'transparent';
+    });
+
+    // 닫기 버튼
+    const closeBtn = panel.querySelector('.close-btn');
+    closeBtn.addEventListener('click', () => this.removeActionPanel());
+    closeBtn.addEventListener('mouseenter', (e) => {
+      e.target.style.color = '#fff';
+    });
+    closeBtn.addEventListener('mouseleave', (e) => {
+      e.target.style.color = '#999';
+    });
+
+    // 화면 캡처 버튼
+    captureBtn.addEventListener('click', () => this.captureScreen());
+
+    // 파일 선택 버튼
+    const fileInput = panel.querySelector('#file-input');
+    selectFileBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        this.handleImageFile(file);
+      }
+    });
+
+    // 이미지 제거 버튼
+    removeImageBtn.addEventListener('click', () => {
+      this.selectedImage = null;
+      const previewContainer = panel.querySelector('#image-preview-container');
+      previewContainer.style.display = 'none';
+    });
+
+    // 취소 버튼
+    cancelBtn.addEventListener('click', () => this.removeActionPanel());
+
+    // 설명 요청 버튼
+    explainBtn.addEventListener('click', () => {
+      if (onExplain) {
+        onExplain(this.selectedImage);
+      }
+      this.removeActionPanel();
+    });
+
+    // 외부 클릭 시 닫기
+    setTimeout(() => {
+      const closeOnOutsideClick = (e) => {
+        if (!panel.contains(e.target)) {
+          this.removeActionPanel();
+          document.removeEventListener('click', closeOnOutsideClick);
+        }
+      };
+      document.addEventListener('click', closeOnOutsideClick);
+    }, 100);
+
+    return panel;
+  }
+
+  /**
+   * 액션 패널 제거
+   */
+  removeActionPanel() {
+    if (this.actionPanel) {
+      this.actionPanel.remove();
+      this.actionPanel = null;
+      this.selectedImage = null;
+    }
+  }
+
+  /**
+   * 이미지 파일 처리
+   */
+  handleImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.selectedImage = e.target.result;
+      this.showImagePreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * 이미지 미리보기 표시
+   */
+  showImagePreview(dataUrl) {
+    if (!this.actionPanel) return;
+
+    const previewContainer = this.actionPanel.querySelector('#image-preview-container');
+    const previewImg = this.actionPanel.querySelector('#image-preview');
+
+    previewImg.src = dataUrl;
+    previewContainer.style.display = 'block';
+  }
+
+  /**
+   * 화면 캡처
+   */
+  async captureScreen() {
+    try {
+      if (!this.actionPanel) {
+        this.showToast('액션 패널을 찾을 수 없습니다.');
+        return;
+      }
+
+      console.log('📸 화면 캡처 준비: UI 요소 숨김');
+
+      // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
+      const originalPanelDisplay = this.actionPanel.style.display;
+      this.actionPanel.style.display = 'none';
+
+      const originalButtonDisplay = this.floatingButton?.style.display;
+      if (this.floatingButton) {
+        this.floatingButton.style.display = 'none';
+      }
+
+      // 2. 화면이 완전히 렌더링되도록 약간 대기
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 3. 화면 캡처 요청
+      chrome.runtime.sendMessage(
+        { type: 'CAPTURE_SCREEN' },
+        (response) => {
+          // 4. 캡처 완료 후 UI 요소 다시 표시
+          if (this.actionPanel) {
+            this.actionPanel.style.display = originalPanelDisplay;
+          }
+          if (this.floatingButton) {
+            this.floatingButton.style.display = originalButtonDisplay || '';
+          }
+
+          if (chrome.runtime.lastError) {
+            console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError);
+            this.showToast(`화면 캡처에 실패했습니다: ${chrome.runtime.lastError.message}`);
+            return;
+          }
+
+          if (response && response.error) {
+            console.error('❌ 화면 캡처 실패:', response.error);
+            this.showToast(`화면 캡처에 실패했습니다: ${response.error}`);
+            return;
+          }
+
+          if (response && response.dataUrl) {
+            console.log('✅ 화면 캡처 성공');
+            this.selectedImage = response.dataUrl;
+            this.showImagePreview(response.dataUrl);
+          } else {
+            console.error('❌ 응답 데이터 없음:', response);
+            this.showToast('화면 캡처에 실패했습니다: 응답 데이터 없음');
+          }
+        }
+      );
+    } catch (error) {
+      console.error('❌ 화면 캡처 예외:', error);
+
+      // 에러 발생 시에도 UI 요소 복구
+      if (this.actionPanel) {
+        this.actionPanel.style.display = '';
+      }
+      if (this.floatingButton) {
+        this.floatingButton.style.display = '';
+      }
+
+      this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
     }
   }
 

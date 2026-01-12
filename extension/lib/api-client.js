@@ -4,7 +4,7 @@
  */
 class APIClient {
   constructor(baseURL) {
-    this.baseURL = baseURL || 'http://localhost:7777';
+    this.baseURL = baseURL || 'http://localhost:8081';
     this.USE_DUMMY = true; // 더미 데이터 사용 플래그
   }
 
@@ -45,10 +45,54 @@ class APIClient {
   }
 
   /**
+   * 이미지 업로드
+   */
+  async uploadImage(imageData) {
+    console.log('📤 [API] 이미지 업로드 요청:', imageData ? `${imageData.substring(0, 50)}...` : '없음');
+
+    if (this.USE_DUMMY) {
+      // 더미 응답 시뮬레이션 (업로드 시간)
+      await this._delay(800);
+
+      const response = {
+        imageId: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        imageUrl: 'https://example.com/uploads/screenshot.png',
+        size: imageData ? Math.floor(imageData.length * 0.75) : 0,
+        uploadedAt: new Date().toISOString()
+      };
+
+      console.log('📥 [API] 이미지 업로드 응답:', response);
+      return response;
+    }
+
+    // 실제 API 호출
+    // Base64를 Blob으로 변환
+    const base64Data = imageData.split(',')[1];
+    const blob = this._base64ToBlob(base64Data, 'image/png');
+
+    const formData = new FormData();
+    formData.append('image', blob, 'screenshot.png');
+
+    const response = await fetch(`${this.baseURL}/api/image/upload`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error(`이미지 업로드 오류: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  /**
    * 자막 설명 요청
    */
   async explainSubtitle(data) {
-    console.log('📤 [API] 자막 설명 요청:', data);
+    console.log('📤 [API] 자막 설명 요청:', {
+      ...data,
+      imageId: data.imageId || '없음'
+    });
 
     if (this.USE_DUMMY) {
       // 더미 응답 시뮬레이션 (캐시 여부에 따라 지연 시간 다르게)
@@ -60,7 +104,7 @@ class APIClient {
       // 더미 설명 데이터
       const dummyExplanations = [
         {
-          text: `"${data.selectedText}"는 주인공이 과거 타임슬립을 통해 만난 인물을 언급하는 장면입니다. 이전 에피소드에서 등장한 핵심 복선이 풀리는 순간이에요.`,
+          text: `"${data.selectedText}"는 주인공이 과거 타임슬립을 통해 만난 인물을 언급하는 장면입니다. 이전 에피소드에서 등장한 핵심 복선이 풀리는 순간이에요.${data.imageId ? ' (이미지 분석: 주인공의 표정이 놀라움과 슬픔을 동시에 나타내고 있습니다.)' : ''}`,
           sources: [
             {
               type: 'namuwiki',
@@ -81,7 +125,7 @@ class APIClient {
           responseTime: delay
         },
         {
-          text: `이 대사는 주인공의 과거 회상 장면과 연결됩니다. "${data.selectedText}"를 통해 등장인물 간의 숨겨진 관계가 드러나는 중요한 순간입니다.`,
+          text: `이 대사는 주인공의 과거 회상 장면과 연결됩니다. "${data.selectedText}"를 통해 등장인물 간의 숨겨진 관계가 드러나는 중요한 순간입니다.${data.imageId ? ' (이미지 분석: 배경에서 의미심장한 소품들이 보입니다.)' : ''}`,
           sources: [
             {
               type: 'wikipedia',
@@ -93,7 +137,7 @@ class APIClient {
           responseTime: delay
         },
         {
-          text: `"${data.selectedText}"는 이 작품의 핵심 주제를 상징하는 대사입니다. 등장인물의 내면 갈등과 성장을 보여주는 장면으로, 전체 서사에서 중요한 전환점이 됩니다.`,
+          text: `"${data.selectedText}"는 이 작품의 핵심 주제를 상징하는 대사입니다. 등장인물의 내면 갈등과 성장을 보여주는 장면으로, 전체 서사에서 중요한 전환점이 됩니다.${data.imageId ? ' (이미지 분석: 화면의 조명과 색감이 극적인 분위기를 연출하고 있습니다.)' : ''}`,
           sources: [
             {
               type: 'fandom',
@@ -126,13 +170,31 @@ class APIClient {
       return response;
     }
 
-    // 실제 API 호출 (추후 구현)
+    // 실제 API 호출
+    const requestBody = {
+      platform: data.platform || 'netflix',
+      videoId: data.videoId,
+      title: data.metadata?.title,
+      episode: data.metadata?.episode,
+      season: data.metadata?.season,
+      duration: data.metadata?.duration,
+      currentSubtitle: {
+        text: data.selectedText,
+        timestamp: data.timestamp
+      }
+    };
+
+    // 이미지 ID가 있으면 추가
+    if (data.imageId) {
+      requestBody.imageId = data.imageId;
+    }
+
     const response = await fetch(`${this.baseURL}/api/explain`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(requestBody)
     });
 
     if (response.status === 202) {
@@ -147,7 +209,18 @@ class APIClient {
       throw new Error(`API 오류: ${response.status}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+
+    // 응답 형식 변환 (백엔드 응답 형식에 맞춤)
+    if (result.error === "0" && result.data) {
+      return {
+        text: result.data.msg,
+        cached: false,
+        responseTime: 0
+      };
+    }
+
+    throw new Error(result.message || '알 수 없는 오류');
   }
 
   /**
@@ -185,6 +258,21 @@ class APIClient {
    */
   _delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Base64를 Blob으로 변환
+   */
+  _base64ToBlob(base64, mimeType) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
   }
 
   /**

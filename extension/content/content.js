@@ -75,28 +75,24 @@ function setupEventListeners() {
   console.log('🎧 이벤트 리스너 설정 중...');
 
   // 2. 플로팅 버튼 클릭
-  ui.floatingButton.addEventListener('click', async () => {
+  ui.floatingButton.addEventListener('click', () => {
     const currentSubtitle = detector.getCurrentSubtitle();
 
     if (currentSubtitle) {
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      await explainSubtitle(currentSubtitle, centerX, centerY);
+      showActionPanel(currentSubtitle);
     } else {
       ui.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');
     }
   });
 
   // 3. 단축키 (Ctrl+E / ⌘+E)
-  document.addEventListener('keydown', async (e) => {
+  document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
       e.preventDefault();
 
       const currentSubtitle = detector.getCurrentSubtitle();
       if (currentSubtitle) {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        await explainSubtitle(currentSubtitle, centerX, centerY);
+        showActionPanel(currentSubtitle);
       } else {
         ui.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');
       }
@@ -106,11 +102,22 @@ function setupEventListeners() {
   console.log('✅ 이벤트 리스너 설정 완료');
 }
 
+function showActionPanel(text) {
+  console.log(`📋 액션 패널 표시: "${text}"`);
+
+  ui.createActionPanel(text, async (imageData) => {
+    // 설명 요청
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    await explainSubtitle(text, centerX, centerY, imageData);
+  });
+}
+
 /**
  * 자막 설명 요청
  */
-async function explainSubtitle(text, x, y) {
-  console.log(`💡 설명 요청: "${text}"`);
+async function explainSubtitle(text, x, y, imageData = null) {
+  console.log(`💡 설명 요청: "${text}"`, imageData ? '(이미지 포함)' : '');
 
   // 로딩 패널 표시
   const panel = ui.createExplanationPanel(text, x, y);
@@ -119,12 +126,27 @@ async function explainSubtitle(text, x, y) {
     const metadata = detector.metadata;
     const timestamp = detector.getCurrentTime();
 
-    // API 호출
+    let imageId = null;
+
+    // 1단계: 이미지가 있으면 먼저 업로드
+    if (imageData) {
+      console.log('📤 이미지 업로드 중...');
+      ui.updateExplanationPanelStatus('이미지 업로드 중...');
+
+      const uploadResult = await apiClient.uploadImage(imageData);
+      imageId = uploadResult.imageId;
+
+      console.log(`✅ 이미지 업로드 완료: ${imageId}`);
+      ui.updateExplanationPanelStatus('분석 중...');
+    }
+
+    // 2단계: 자막 설명 요청 (imageId 포함)
     const explanation = await apiClient.explainSubtitle({
       videoId: metadata.videoId,
       selectedText: text,
       timestamp: timestamp,
-      metadata: metadata
+      metadata: metadata,
+      imageId: imageId // 이미지 ID 추가
     });
 
     console.log(`⚡ 응답 시간: ${explanation.responseTime}ms`);
