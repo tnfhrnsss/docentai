@@ -5,9 +5,8 @@
   "popup": {
     "howToUse": "How to Use",
     "step1": "Play a video on Netflix",
-    "step2": "Hover over subtitles to see the 💡 button",
-    "step3": "Click the 💡 button or press {shortcut}",
-    "step4": "AI will explain the context of the subtitle",
+    "step2": "Click the 💡 button or press {shortcut}",
+    "step3": "AI will explain the context of the subtitle",
     "shortcutWin": "Ctrl+E",
     "shortcutMac": "⌘+E",
     "statusLabel": "Status:",
@@ -31,14 +30,8 @@
     "enableExtension": "Enable Extension",
     "enableExtensionDesc": "Turn DocentAI features on or off",
 
-    "autoAnalyze": "Auto Video Analysis",
-    "autoAnalyzeDesc": "Automatically start analysis when video plays",
-
     "showFloatingButton": "Show Floating Button",
     "showFloatingButtonDesc": "Display the 💡 button in the bottom right",
-
-    "showHoverIndicator": "Show Subtitle Hover Indicator",
-    "showHoverIndicatorDesc": "Display 💡 icon when hovering over subtitles",
 
     "useDummyData": "Use Dummy Data (Dev Mode)",
     "useDummyDataDesc": "Use dummy data instead of actual API",

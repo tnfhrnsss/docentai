@@ -59,7 +59,7 @@ async function registerVideo(metadata) {
     if (response.status === 'processing') {
       ui.showToast('영상 분석을 시작합니다.');
     } else if (response.status === 'ready') {
-      ui.showToast('✅ 준비 완료! 자막을 클릭해보세요.');
+      ui.showToast('✅ 준비 완료!');
     }
 
   } catch (error) {

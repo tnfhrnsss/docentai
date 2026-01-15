@@ -5,9 +5,8 @@
   "popup": {
     "howToUse": "사용 방법",
     "step1": "넷플릭스에서 영상을 재생하세요",
-    "step2": "자막 위에 마우스를 올리면 💡 버튼이 나타납니다",
-    "step3": "💡 버튼을 클릭하거나 {shortcut}를 누르세요",
-    "step4": "AI가 자막의 맥락을 설명해드립니다",
+    "step2": "💡 버튼을 클릭하거나 {shortcut}를 누르세요",
+    "step3": "AI가 자막의 맥락을 설명해드립니다",
     "shortcutWin": "Ctrl+E",
     "shortcutMac": "⌘+E",
     "statusLabel": "상태:",
@@ -31,14 +30,8 @@
     "enableExtension": "확장 프로그램 활성화",
     "enableExtensionDesc": "DocentAI 기능을 켜거나 끕니다",
 
-    "autoAnalyze": "자동 영상 분석",
-    "autoAnalyzeDesc": "영상 재생 시 자동으로 분석을 시작합니다",
-
     "showFloatingButton": "플로팅 버튼 표시",
     "showFloatingButtonDesc": "우측 하단에 💡 버튼을 표시합니다",
-
-    "showHoverIndicator": "자막 호버 인디케이터 표시",
-    "showHoverIndicatorDesc": "자막에 마우스를 올렸을 때 💡 아이콘을 표시합니다",
 
     "useDummyData": "더미 데이터 사용 (개발 모드)",
     "useDummyDataDesc": "실제 API 대신 더미 데이터를 사용합니다",

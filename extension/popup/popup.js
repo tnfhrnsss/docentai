@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Step3 텍스트 동적 처리 (HTML 태그 포함)
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   const shortcut = isMac ? i18n.t('popup.shortcutMac') : i18n.t('popup.shortcutWin');
-  const step3Element = document.getElementById('step3-text');
-  const step3Text = i18n.t('popup.step3', { shortcut });
-  step3Element.innerHTML = step3Text.replace(
+  const step2Element = document.getElementById('step2-text');
+  const step2Text = i18n.t('popup.step2', { shortcut });
+  step2Element.innerHTML = step2Text.replace(
     shortcut,
     `<kbd>${shortcut}</kbd>`
   );
