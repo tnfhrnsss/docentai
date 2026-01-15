@@ -124,7 +124,6 @@ async function explainSubtitle(text, x, y, imageData = null) {
 
   try {
     const metadata = detector.metadata;
-    const timestamp = detector.getCurrentTime();
 
     let imageId = null;
 
@@ -144,7 +143,6 @@ async function explainSubtitle(text, x, y, imageData = null) {
     const explanation = await apiClient.explainSubtitle({
       videoId: metadata.videoId,
       selectedText: text,
-      timestamp: timestamp,
       metadata: metadata,
       imageId: imageId // 이미지 ID 추가
     });

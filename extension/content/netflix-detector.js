@@ -30,16 +30,13 @@ class NetflixDetector {
       const title = this.extractTitle();
       const episode = this.extractEpisode();
       const season = this.extractSeason();
-      const duration = this.getVideoDuration();
 
       this.metadata = {
         platform: 'netflix',
         videoId,
         title,
         episode,
-        season,
-        duration,
-        url: window.location.href
+        season
       };
 
       console.log('🎬 영상 감지:', this.metadata);
@@ -117,40 +114,6 @@ class NetflixDetector {
     }
 
     return 1; // 기본값
-  }
-
-  /**
-   * 영상 길이 가져오기
-   */
-  getVideoDuration() {
-    const video = document.querySelector('video');
-    if (video && video.duration) {
-      return Math.floor(video.duration);
-    }
-    return null;
-  }
-
-  /**
-   * 현재 재생 시간 가져오기
-   */
-  getCurrentTime() {
-    const video = document.querySelector('video');
-    if (video) {
-      return video.currentTime;
-    }
-    return 0;
-  }
-
-  /**
-   * 특정 시간으로 이동
-   */
-  seekTo(timestamp) {
-    const video = document.querySelector('video');
-    if (video) {
-      video.currentTime = timestamp;
-      return true;
-    }
-    return false;
   }
 
   /**

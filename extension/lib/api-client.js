@@ -1,7 +1,4 @@
-/**
- * Backend API 클라이언트 (더미 데이터 버전)
- * UI 기능 검증용
- */
+
 class APIClient {
   constructor(baseURL) {
     this.baseURL = baseURL || 'http://localhost:8081';
@@ -15,7 +12,6 @@ class APIClient {
     console.log('📤 [API] 영상 등록 요청:', metadata);
 
     if (this.USE_DUMMY) {
-      // 더미 응답 시뮬레이션 (약간의 지연)
       await this._delay(500);
 
       const response = {
@@ -28,8 +24,7 @@ class APIClient {
       return response;
     }
 
-    // 실제 API 호출 (추후 구현)
-    const response = await fetch(`${this.baseURL}/api/video/register`, {
+    const response = await fetch(`${this.baseURL}/api/videos`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
