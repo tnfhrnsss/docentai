@@ -132,7 +132,7 @@ async function explainSubtitle(text, x, y, imageData = null) {
       console.log('📤 이미지 업로드 중...');
       ui.updateExplanationPanelStatus('이미지 업로드 중...');
 
-      const uploadResult = await apiClient.uploadImage(imageData);
+      const uploadResult = await apiClient.uploadImage(metadata.videoId, imageData);
       imageId = uploadResult.imageId;
 
       console.log(`✅ 이미지 업로드 완료: ${imageId}`);

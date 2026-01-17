@@ -42,7 +42,9 @@ class APIClient {
   /**
    * 이미지 업로드
    */
-  async uploadImage(imageData) {
+  async uploadImage(videoId, imageData) {
+    const startTime = performance.now();
+    const originalSize = imageData ? imageData.length : 0;
     console.log('📤 [API] 이미지 업로드 요청:', imageData ? `${imageData.substring(0, 50)}...` : '없음');
 
     if (this.USE_DUMMY) {
@@ -60,15 +62,27 @@ class APIClient {
       return response;
     }
 
-    // 실제 API 호출
+    // 실제 API 호출 시 이미지 압축
+    const compressStart = performance.now();
+    console.log('🔄 이미지 압축 중... (원본 크기:', Math.floor(originalSize / 1024), 'KB)');
+
+    imageData = await ImageIOUtils._compressImage(imageData, 640, 360, 0.8);
+
+    const compressTime = performance.now() - compressStart;
+    const compressedSize = imageData.length;
+    const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+
+    console.log(`✅ 압축 완료: ${Math.floor(compressedSize / 1024)}KB (${compressionRatio}% 감소, ${compressTime.toFixed(0)}ms)`);
+
     // Base64를 Blob으로 변환
     const base64Data = imageData.split(',')[1];
-    const blob = this._base64ToBlob(base64Data, 'image/png');
+    const blob = ImageIOUtils._base64ToBlob(base64Data, 'image/jpeg');
 
     const formData = new FormData();
-    formData.append('image', blob, 'screenshot.png');
+    formData.append('image', blob, 'screenshot.jpg');
 
-    const response = await fetch(`${this.baseURL}/api/image/upload`, {
+    const uploadStart = performance.now();
+    const response = await fetch(`${this.baseURL}/api/upload/${videoId}`, {
       method: 'POST',
       body: formData
     });
@@ -76,6 +90,10 @@ class APIClient {
     if (!response.ok) {
       throw new Error(`이미지 업로드 오류: ${response.status}`);
     }
+
+    const uploadTime = performance.now() - uploadStart;
+    const totalTime = performance.now() - startTime;
+    console.log(`⏱️ 업로드 시간: ${uploadTime.toFixed(0)}ms, 총 시간: ${totalTime.toFixed(0)}ms`);
 
     return await response.json();
   }
@@ -253,21 +271,6 @@ class APIClient {
    */
   _delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Base64를 Blob으로 변환
-   */
-  _base64ToBlob(base64, mimeType) {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mimeType });
   }
 
   /**
