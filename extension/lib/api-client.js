@@ -3,6 +3,114 @@ class APIClient {
   constructor(baseURL) {
     this.baseURL = baseURL || 'http://localhost:8081';
     this.USE_DUMMY = true; // 더미 데이터 사용 플래그
+    this._tokenCache = null; // 토큰 캐시 (메모리)
+  }
+
+  /**
+   * 인증 토큰 확인 및 갱신
+   * @returns {Promise<string|null>} 유효한 토큰 또는 null (더미 모드)
+   */
+  async _ensureAuthenticated() {
+    // 더미 모드에서는 인증 불필요
+    if (this.USE_DUMMY) {
+      return null;
+    }
+
+    // 1. 메모리 캐시 확인
+    if (this._tokenCache && this._tokenCache.expiresAt > Date.now()) {
+      return this._tokenCache.token;
+    }
+
+    // 2. Chrome Storage에서 토큰 가져오기
+    const storedToken = await this._getStoredToken();
+    if (storedToken && storedToken.expiresAt > Date.now()) {
+      this._tokenCache = storedToken;
+      return storedToken.token;
+    }
+
+    // 3. 토큰 만료 또는 없음 → 새로 발급
+    console.log('🔐 토큰 발급 중...');
+    const newToken = await this._fetchToken();
+
+    // 4. Storage와 메모리에 저장
+    await this._saveToken(newToken);
+    this._tokenCache = newToken;
+
+    console.log('✅ 토큰 발급 완료:', newToken.expiresAt ? new Date(newToken.expiresAt).toLocaleString() : 'N/A');
+    return newToken.token;
+  }
+
+  /**
+   * Netflix localStorage에서 Profile ID 가져오기
+   */
+  _getProfileId() {
+    try {
+      const profileId = localStorage.getItem('MDX_PROFILEID');
+      if (!profileId) {
+        throw new Error('Netflix Profile ID를 찾을 수 없습니다. Netflix에 로그인되어 있는지 확인하세요.');
+      }
+      return profileId;
+    } catch (error) {
+      console.error('❌ Profile ID 가져오기 실패:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 토큰 발급 API 호출
+   * @returns {Promise<{token: string, expiresAt: number}>}
+   */
+  async _fetchToken() {
+    const profileId = this._getProfileId();
+
+    const response = await fetch(`${this.baseURL}/api/auth/token`, {
+      method: 'POST',
+      headers: {
+        'X-Profile-ID': profileId
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`토큰 발급 실패: ${response.status}`);
+    }
+
+    const { token, expiresAt } = await response.json();
+    return { token, expiresAt };
+  }
+
+  /**
+   * Chrome Storage에서 저장된 토큰 가져오기
+   */
+  async _getStoredToken() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['authToken', 'tokenExpiry'], (result) => {
+        if (result.authToken && result.tokenExpiry) {
+          resolve({
+            token: result.authToken,
+            expiresAt: result.tokenExpiry
+          });
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  }
+
+  /**
+   * Chrome Storage에 토큰 저장
+   */
+  async _saveToken({ token, expiresAt }) {
+    return new Promise((resolve) => {
+      chrome.storage.local.set(
+        {
+          authToken: token,
+          tokenExpiry: expiresAt
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
   }
 
   /**
@@ -24,11 +132,20 @@ class APIClient {
       return response;
     }
 
+    // 인증 토큰 확인
+    const token = await this._ensureAuthenticated();
+
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${this.baseURL}/api/videos`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(metadata)
     });
 
@@ -81,9 +198,18 @@ class APIClient {
     const formData = new FormData();
     formData.append('image', blob, 'screenshot.jpg');
 
+    // 인증 토큰 확인
+    const token = await this._ensureAuthenticated();
+
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const uploadStart = performance.now();
     const response = await fetch(`${this.baseURL}/api/upload/${videoId}`, {
       method: 'POST',
+      headers,
       body: formData
     });
 
@@ -190,7 +316,7 @@ class APIClient {
       title: data.metadata?.title,
       episode: data.metadata?.episode,
       season: data.metadata?.season,
-      duration: data.metadata?.duration,
+      lang: navigator.language || navigator.languages?.[0] || 'en',
       currentSubtitle: {
         text: data.selectedText,
         timestamp: data.timestamp
@@ -202,11 +328,20 @@ class APIClient {
       requestBody.imageId = data.imageId;
     }
 
-    const response = await fetch(`${this.baseURL}/api/explain`, {
+    // 인증 토큰 확인
+    const token = await this._ensureAuthenticated();
+
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseURL}/api/explanations`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(requestBody)
     });
 
@@ -256,8 +391,18 @@ class APIClient {
       return response;
     }
 
-    // 실제 API 호출 (추후 구현)
-    const response = await fetch(`${this.baseURL}/api/video/${videoId}/status`);
+    // 인증 토큰 확인
+    const token = await this._ensureAuthenticated();
+
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // 실제 API 호출
+    const response = await fetch(`${this.baseURL}/api/video/${videoId}/status`, {
+      headers
+    });
 
     if (!response.ok) {
       throw new Error(`API 오류: ${response.status}`);
