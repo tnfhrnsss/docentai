@@ -208,37 +208,16 @@ class UIComponents {
     }
 
     content.innerHTML = `
-      <div style="margin-bottom: 16px;">
+      <div style="
+        margin-bottom: 16px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: calc(1.7em * 4 + 8px);
+        overflow-y: auto;
+        padding-right: 8px;
+      ">
         ${explanation.text}
       </div>
-
-      ${explanation.sources && explanation.sources.length > 0 ? `
-        <div style="
-          margin-top: 16px;
-          padding-top: 16px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-        ">
-          <div style="
-            font-size: 13px;
-            color: #ffd700;
-            font-weight: 500;
-            margin-bottom: 8px;
-          ">${i18n.t('ui.sourcesTitle')}</div>
-          ${explanation.sources.map(source => `
-            <div style="
-              font-size: 12px;
-              color: #999;
-              margin-top: 4px;
-              display: flex;
-              align-items: center;
-              gap: 6px;
-            ">
-              <span>${this.getSourceIcon(source.type)}</span>
-              <span>${source.title || source.type}</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
 
       ${explanation.references && explanation.references.length > 0 ? `
         <div style="
@@ -386,47 +365,24 @@ class UIComponents {
             font-weight: 500;
           ">이미지 첨부 (선택사항)</div>
 
-          <div style="
+          <button id="capture-screen-btn" style="
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             margin-bottom: 12px;
           ">
-            <button id="capture-screen-btn" style="
-              flex: 1;
-              padding: 10px;
-              background: rgba(255, 255, 255, 0.1);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              border-radius: 6px;
-              color: white;
-              cursor: pointer;
-              font-size: 13px;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
-            ">
-              📸 화면 캡처
-            </button>
-            <button id="select-file-btn" style="
-              flex: 1;
-              padding: 10px;
-              background: rgba(255, 255, 255, 0.1);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              border-radius: 6px;
-              color: white;
-              cursor: pointer;
-              font-size: 13px;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
-            ">
-              📁 파일 선택
-            </button>
-          </div>
-          <input type="file" id="file-input" accept="image/*" style="display: none;">
+            📸 화면 캡처
+          </button>
 
           <div id="image-preview-container" style="
             display: none;
@@ -500,20 +456,17 @@ class UIComponents {
 
     // 버튼 호버 효과
     const captureBtn = panel.querySelector('#capture-screen-btn');
-    const selectFileBtn = panel.querySelector('#select-file-btn');
     const explainBtn = panel.querySelector('#explain-btn');
     const cancelBtn = panel.querySelector('#cancel-btn');
     const removeImageBtn = panel.querySelector('#remove-image-btn');
 
-    [captureBtn, selectFileBtn].forEach(btn => {
-      btn.addEventListener('mouseenter', () => {
-        btn.style.background = 'rgba(255, 255, 255, 0.15)';
-        btn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-      });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.background = 'rgba(255, 255, 255, 0.1)';
-        btn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-      });
+    captureBtn.addEventListener('mouseenter', () => {
+      captureBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+      captureBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    });
+    captureBtn.addEventListener('mouseleave', () => {
+      captureBtn.style.background = 'rgba(255, 255, 255, 0.1)';
+      captureBtn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
     });
 
     explainBtn.addEventListener('mouseenter', () => {
@@ -551,16 +504,6 @@ class UIComponents {
 
     // 화면 캡처 버튼
     captureBtn.addEventListener('click', () => this.captureScreen());
-
-    // 파일 선택 버튼
-    const fileInput = panel.querySelector('#file-input');
-    selectFileBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        this.handleImageFile(file);
-      }
-    });
 
     // 이미지 제거 버튼
     removeImageBtn.addEventListener('click', () => {
@@ -634,23 +577,41 @@ class UIComponents {
    * 화면 캡처
    */
   async captureScreen() {
-    try {
-      if (!this.actionPanel) {
-        this.showToast('액션 패널을 찾을 수 없습니다.');
-        return;
+    if (!this.actionPanel) {
+      this.showToast('액션 패널을 찾을 수 없습니다.');
+      return;
+    }
+
+    console.log('📸 화면 캡처 준비: UI 요소 숨김');
+
+    // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
+    const originalPanelDisplay = this.actionPanel.style.display;
+    this.actionPanel.style.display = 'none';
+
+    const originalButtonDisplay = this.floatingButton?.style.display;
+    if (this.floatingButton) {
+      this.floatingButton.style.display = 'none';
+    }
+
+    // UI 복구 함수 (무조건 복구되도록 보장)
+    const restoreUI = () => {
+      console.log('🔄 UI 복구 중...');
+      if (this.actionPanel) {
+        this.actionPanel.style.display = originalPanelDisplay;
       }
-
-      console.log('📸 화면 캡처 준비: UI 요소 숨김');
-
-      // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
-      const originalPanelDisplay = this.actionPanel.style.display;
-      this.actionPanel.style.display = 'none';
-
-      const originalButtonDisplay = this.floatingButton?.style.display;
       if (this.floatingButton) {
-        this.floatingButton.style.display = 'none';
+        this.floatingButton.style.display = originalButtonDisplay || '';
       }
+    };
 
+    // 타임아웃 설정 (5초 후 무조건 UI 복구)
+    const timeoutId = setTimeout(() => {
+      console.warn('⏱️ 화면 캡처 타임아웃 - UI 강제 복구');
+      restoreUI();
+      this.showToast('화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.');
+    }, 5000);
+
+    try {
       // 2. 화면이 완전히 렌더링되도록 약간 대기
       await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -658,13 +619,11 @@ class UIComponents {
       chrome.runtime.sendMessage(
         { type: 'CAPTURE_SCREEN' },
         (response) => {
+          // 타임아웃 취소
+          clearTimeout(timeoutId);
+
           // 4. 캡처 완료 후 UI 요소 다시 표시
-          if (this.actionPanel) {
-            this.actionPanel.style.display = originalPanelDisplay;
-          }
-          if (this.floatingButton) {
-            this.floatingButton.style.display = originalButtonDisplay || '';
-          }
+          restoreUI();
 
           if (chrome.runtime.lastError) {
             console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError);
@@ -691,13 +650,11 @@ class UIComponents {
     } catch (error) {
       console.error('❌ 화면 캡처 예외:', error);
 
+      // 타임아웃 취소
+      clearTimeout(timeoutId);
+
       // 에러 발생 시에도 UI 요소 복구
-      if (this.actionPanel) {
-        this.actionPanel.style.display = '';
-      }
-      if (this.floatingButton) {
-        this.floatingButton.style.display = '';
-      }
+      restoreUI();
 
       this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
     }

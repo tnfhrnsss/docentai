@@ -133,4 +133,15 @@ class NetflixDetector {
     }
     return null;
   }
+
+  /**
+   * 현재 재생 시간 가져오기 (초 단위)
+   */
+  getCurrentTime() {
+    const video = document.querySelector('video');
+    if (video) {
+      return video.currentTime;
+    }
+    return 0;
+  }
 }

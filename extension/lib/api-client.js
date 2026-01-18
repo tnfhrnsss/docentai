@@ -1,8 +1,8 @@
 
 class APIClient {
   constructor(baseURL) {
-    this.baseURL = baseURL || 'http://localhost:8081';
-    this.USE_DUMMY = true; // 더미 데이터 사용 플래그
+    this.baseURL = baseURL || 'http://localhost:8001';
+    this.USE_DUMMY = false; // 더미 데이터 사용 플래그
     this._tokenCache = null; // 토큰 캐시 (메모리)
   }
 
@@ -311,16 +311,9 @@ class APIClient {
 
     // 실제 API 호출
     const requestBody = {
-      platform: data.platform || 'netflix',
-      videoId: data.videoId,
-      title: data.metadata?.title,
-      episode: data.metadata?.episode,
-      season: data.metadata?.season,
-      lang: navigator.language || navigator.languages?.[0] || 'en',
-      currentSubtitle: {
-        text: data.selectedText,
-        timestamp: data.timestamp
-      }
+      language: navigator.language || navigator.languages?.[0] || 'en',
+      selectedText: data.selectedText,
+      timestamp: data.timestamp
     };
 
     // 이미지 ID가 있으면 추가
@@ -339,7 +332,7 @@ class APIClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${this.baseURL}/api/explanations`, {
+    const response = await fetch(`${this.baseURL}/api/explanations/videos/${data.videoId}`, {
       method: 'POST',
       headers,
       body: JSON.stringify(requestBody)
@@ -359,16 +352,19 @@ class APIClient {
 
     const result = await response.json();
 
-    // 응답 형식 변환 (백엔드 응답 형식에 맞춤)
-    if (result.error === "0" && result.data) {
+    // 응답 형식 변환 (백엔드 응답 형식에 맞춰 파싱)
+    if (result.success && result.data && result.data.explanation) {
       return {
-        text: result.data.msg,
-        cached: false,
-        responseTime: 0
+        text: result.data.explanation.text,
+        sources: result.data.explanation.sources || [],
+        references: result.data.explanation.references || [],
+        cached: result.data.cached || false,
+        responseTime: result.data.responseTime || 0
       };
     }
 
-    throw new Error(result.message || '알 수 없는 오류');
+    // 에러 응답 처리
+    throw new Error(result.message || result.error || '알 수 없는 오류');
   }
 
   /**

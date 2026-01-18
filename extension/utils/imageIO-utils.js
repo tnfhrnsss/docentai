@@ -7,7 +7,7 @@ class ImageIOUtils {
      * @param {number} quality - JPEG 품질 (0.0 ~ 1.0)
      * @returns {Promise<string>} 압축된 Base64 data URL
      */
-    async _compressImage(dataUrl, maxWidth = 640, maxHeight = 360, quality = 0.8) {
+    static async _compressImage(dataUrl, maxWidth = 640, maxHeight = 360, quality = 0.8) {
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
@@ -37,7 +37,7 @@ class ImageIOUtils {
         });
     }
 
-    _base64ToBlob(base64, mimeType) {
+    static _base64ToBlob(base64, mimeType) {
         const byteCharacters = atob(base64);
         const byteNumbers = new Array(byteCharacters.length);
 

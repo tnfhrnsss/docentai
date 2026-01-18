@@ -24,6 +24,31 @@
   scrollbar-color: rgba(255, 215, 0, 0.5) rgba(255, 255, 255, 0.05);
 }
 
+/* 설명 텍스트 영역 스크롤바 (WebKit) */
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar {
+  width: 6px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.5);
+  border-radius: 3px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 215, 0, 0.7);
+}
+
+/* Firefox용 스크롤바 */
+#subtitle-explanation-panel .explanation-content > div:first-child {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.5) rgba(255, 255, 255, 0.05);
+}
+
 /* 링크 호버 효과 */
 #subtitle-explanation-panel a:hover {
   text-decoration: underline !important;

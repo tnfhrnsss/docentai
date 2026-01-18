@@ -10,7 +10,7 @@ async function init() {
 
   // 인스턴스 생성
   detector = new NetflixDetector();
-  apiClient = new APIClient('http://localhost:7777');
+  apiClient = new APIClient('http://localhost:8001');
   ui = new UIComponents();
 
   // CSS 애니메이션 주입
@@ -144,6 +144,7 @@ async function explainSubtitle(text, x, y, imageData = null) {
       videoId: metadata.videoId,
       selectedText: text,
       metadata: metadata,
+      timestamp: detector.getCurrentTime() || 0, // 현재 재생 시간
       imageId: imageId // 이미지 ID 추가
     });
 
