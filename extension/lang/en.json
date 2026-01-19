@@ -15,10 +15,10 @@
     "statusWaiting": "⏸️ Waiting (Works only on Netflix)",
     "versionLabel": "Version:",
     "settingsButton": "⚙️ Settings",
-    "testButton": "🧪 Test",
     "footer": "For a better viewing experience",
     "messageError": "Message sending failed:",
-    "alertNetflixOnly": "Please run on Netflix page."
+    "fullscreenNoticeTitle": "⚠️ Fullscreen Mode",
+    "fullscreenNoticeDesc": "The 💡 button is not visible in fullscreen, but the shortcut key (Ctrl+E / ⌘+E) works normally."
   },
 
   "options": {
@@ -31,13 +31,10 @@
     "enableExtensionDesc": "Turn DocentAI features on or off",
 
     "showFloatingButton": "Show Floating Button",
-    "showFloatingButtonDesc": "Display the 💡 button in the bottom right",
+    "showFloatingButtonDesc": "Display the 💡 button in the top right",
 
     "useDummyData": "Use Dummy Data (Dev Mode)",
     "useDummyDataDesc": "Use dummy data instead of actual API",
-
-    "apiEndpoint": "API Endpoint",
-    "apiEndpointDesc": "Backend API server address",
 
     "saveButton": "Save",
     "resetButton": "Reset",

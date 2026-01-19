@@ -5,7 +5,7 @@
 
 class I18n {
   constructor() {
-    this.currentLang = 'ko'; // 기본 언어
+    this.currentLang = 'en'; // 기본 언어
     this.messages = {};
     this.supportedLangs = ['ko', 'en'];
   }
@@ -16,7 +16,7 @@ class I18n {
   async init() {
     // 브라우저 언어 감지
     const browserLang = this.detectLanguage();
-    this.currentLang = this.supportedLangs.includes(browserLang) ? browserLang : 'ko';
+    this.currentLang = this.supportedLangs.includes(browserLang) ? browserLang : 'en';
 
     // 언어 파일 로드
     await this.loadLanguage(this.currentLang);
@@ -39,14 +39,14 @@ class I18n {
       return this.normalizeLanguage(navigator.language);
     }
 
-    return 'ko'; // 기본값
+    return 'en'; // 기본값
   }
 
   /**
    * 언어 코드 정규화 (예: 'ko-KR' -> 'ko', 'en-US' -> 'en')
    */
   normalizeLanguage(lang) {
-    if (!lang) return 'ko';
+    if (!lang) return 'en';
     const normalized = lang.toLowerCase().split('-')[0];
     return normalized;
   }
@@ -63,9 +63,9 @@ class I18n {
       this.messages = await response.json();
     } catch (error) {
       console.error('Error loading language file:', error);
-      // 폴백: 한국어 로드
-      if (lang !== 'ko') {
-        await this.loadLanguage('ko');
+      // 폴백: 영어 로드
+      if (lang !== 'en') {
+        await this.loadLanguage('en');
       }
     }
   }

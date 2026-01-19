@@ -20,31 +20,31 @@ class UIComponents {
 
     button.style.cssText = `
       position: fixed;
-      bottom: 100px;
+      top: 80px;
       right: 20px;
-      width: 56px;
-      height: 56px;
+      width: 28px;
+      height: 28px;
       background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 28px;
+      font-size: 14px;
       z-index: 9999;
-      box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       animation: fadeIn 0.3s ease-out;
     `;
 
     button.addEventListener('mouseenter', () => {
       button.style.transform = 'scale(1.1)';
-      button.style.boxShadow = '0 6px 24px rgba(255, 215, 0, 0.6)';
+      button.style.boxShadow = '0 3px 12px rgba(255, 215, 0, 0.6)';
     });
 
     button.addEventListener('mouseleave', () => {
       button.style.transform = 'scale(1)';
-      button.style.boxShadow = '0 4px 20px rgba(255, 215, 0, 0.4)';
+      button.style.boxShadow = '0 2px 10px rgba(255, 215, 0, 0.4)';
     });
 
     document.body.appendChild(button);
@@ -303,6 +303,7 @@ class UIComponents {
         left: ${centerX}px;
         top: ${centerY}px;
         width: 400px;
+        max-height: 80vh;
         background: rgba(20, 20, 20, 0.98);
         border: 1px solid rgba(255, 215, 0, 0.3);
         border-radius: 12px;
@@ -312,12 +313,15 @@ class UIComponents {
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(10px);
         animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
       ">
         <div style="
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           margin-bottom: 20px;
+          flex-shrink: 0;
         ">
           <h3 style="
             margin: 0;
@@ -339,88 +343,94 @@ class UIComponents {
           ">×</button>
         </div>
 
-        <div style="
-          background: rgba(255, 215, 0, 0.1);
-          padding: 12px;
-          border-radius: 6px;
+        <div class="action-panel-content" style="
+          flex: 1;
+          overflow-y: auto;
           margin-bottom: 20px;
-          border-left: 3px solid #ffd700;
+          padding-right: 4px;
         ">
           <div style="
-            font-size: 12px;
-            color: #ffd700;
-            margin-bottom: 4px;
-          ">현재 자막</div>
-          <div style="
-            font-size: 15px;
-            color: #e0e0e0;
-          ">"${selectedText}"</div>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <div style="
-            font-size: 14px;
-            color: #ccc;
-            margin-bottom: 12px;
-            font-weight: 500;
-          ">이미지 첨부 (선택사항)</div>
-
-          <button id="capture-screen-btn" style="
-            width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 12px;
-          ">
-            📸 화면 캡처
-          </button>
-
-          <div id="image-preview-container" style="
-            display: none;
-            margin-top: 12px;
+            background: rgba(255, 215, 0, 0.1);
             padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
-            border: 1px dashed rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            border-left: 3px solid #ffd700;
           ">
             <div style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 8px;
-            ">
-              <span style="font-size: 12px; color: #999;">이미지 미리보기</span>
-              <button id="remove-image-btn" style="
-                background: none;
-                border: none;
-                color: #ff6b6b;
-                cursor: pointer;
-                font-size: 12px;
-                padding: 4px 8px;
-                border-radius: 4px;
-                transition: background 0.2s;
-              ">✕ 제거</button>
-            </div>
-            <img id="image-preview" style="
+              font-size: 12px;
+              color: #ffd700;
+              margin-bottom: 4px;
+            ">현재 자막</div>
+            <div style="
+              font-size: 15px;
+              color: #e0e0e0;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            ">"${selectedText}"</div>
+          </div>
+
+          <div>
+            <button id="capture-screen-btn" style="
               width: 100%;
-              border-radius: 4px;
-              display: block;
+              padding: 10px;
+              background: rgba(255, 255, 255, 0.1);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              border-radius: 6px;
+              color: white;
+              cursor: pointer;
+              font-size: 13px;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+              margin-bottom: 12px;
             ">
+              📸 화면 캡처
+            </button>
+
+            <div id="image-preview-container" style="
+              display: none;
+              margin-top: 12px;
+              padding: 12px;
+              background: rgba(255, 255, 255, 0.05);
+              border-radius: 6px;
+              border: 1px dashed rgba(255, 255, 255, 0.2);
+            ">
+              <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+              ">
+                <span style="font-size: 12px; color: #999;">이미지 미리보기</span>
+                <button id="remove-image-btn" style="
+                  background: none;
+                  border: none;
+                  color: #ff6b6b;
+                  cursor: pointer;
+                  font-size: 12px;
+                  padding: 4px 8px;
+                  border-radius: 4px;
+                  transition: background 0.2s;
+                ">✕ 제거</button>
+              </div>
+              <img id="image-preview" style="
+                width: 100%;
+                max-height: 250px;
+                object-fit: contain;
+                border-radius: 4px;
+                display: block;
+              ">
+            </div>
           </div>
         </div>
 
         <div style="
           display: flex;
           gap: 8px;
+          flex-shrink: 0;
         ">
           <button id="cancel-btn" style="
             flex: 1;
@@ -582,6 +592,13 @@ class UIComponents {
       return;
     }
 
+    // Extension context 유효성 체크
+    if (!chrome.runtime || !chrome.runtime.id) {
+      console.error('❌ Extension context invalidated');
+      this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+      return;
+    }
+
     console.log('📸 화면 캡처 준비: UI 요소 숨김');
 
     // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
@@ -627,7 +644,13 @@ class UIComponents {
 
           if (chrome.runtime.lastError) {
             console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError);
-            this.showToast(`화면 캡처에 실패했습니다: ${chrome.runtime.lastError.message}`);
+
+            // Extension context invalidated 에러 특별 처리
+            if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
+              this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+            } else {
+              this.showToast(`화면 캡처에 실패했습니다: ${chrome.runtime.lastError.message}`);
+            }
             return;
           }
 
@@ -656,7 +679,12 @@ class UIComponents {
       // 에러 발생 시에도 UI 요소 복구
       restoreUI();
 
-      this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
+      // Extension context invalidated 에러 특별 처리
+      if (error.message && error.message.includes('Extension context invalidated')) {
+        this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+      } else {
+        this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
+      }
     }
   }
 

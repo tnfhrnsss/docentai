@@ -15,10 +15,10 @@
     "statusWaiting": "⏸️ 대기 중 (넷플릭스에서만 작동)",
     "versionLabel": "버전:",
     "settingsButton": "⚙️ 설정",
-    "testButton": "🧪 테스트",
     "footer": "더 나은 시청 경험을 위해",
     "messageError": "메시지 전송 실패:",
-    "alertNetflixOnly": "넷플릭스 페이지에서 실행해주세요."
+    "fullscreenNoticeTitle": "⚠️ 전체화면 모드",
+    "fullscreenNoticeDesc": "전체화면에서는 💡 버튼이 표시되지 않지만, 단축키 (Ctrl+E / ⌘+E)는 정상 작동합니다."
   },
 
   "options": {
@@ -31,13 +31,7 @@
     "enableExtensionDesc": "DocentAI 기능을 켜거나 끕니다",
 
     "showFloatingButton": "플로팅 버튼 표시",
-    "showFloatingButtonDesc": "우측 하단에 💡 버튼을 표시합니다",
-
-    "useDummyData": "더미 데이터 사용 (개발 모드)",
-    "useDummyDataDesc": "실제 API 대신 더미 데이터를 사용합니다",
-
-    "apiEndpoint": "API 엔드포인트",
-    "apiEndpointDesc": "백엔드 API 서버 주소",
+    "showFloatingButtonDesc": "우측 상단에 💡 버튼을 표시합니다",
 
     "saveButton": "저장",
     "resetButton": "초기화",

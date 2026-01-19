@@ -4,10 +4,7 @@
 
 // 기본 설정값
 const DEFAULT_SETTINGS = {
-  enableExtension: true,
   showFloatingButton: true,
-  useDummyData: true,
-  apiEndpoint: 'http://localhost:7777'
 };
 
 // 설정 로드
@@ -15,20 +12,14 @@ function loadSettings() {
   chrome.storage.sync.get(DEFAULT_SETTINGS, (settings) => {
     console.log('📥 설정 로드:', settings);
 
-    document.getElementById('enableExtension').checked = settings.enableExtension;
     document.getElementById('showFloatingButton').checked = settings.showFloatingButton;
-    document.getElementById('useDummyData').checked = settings.useDummyData;
-    document.getElementById('apiEndpoint').value = settings.apiEndpoint;
   });
 }
 
 // 설정 저장
 function saveSettings() {
   const settings = {
-    enableExtension: document.getElementById('enableExtension').checked,
     showFloatingButton: document.getElementById('showFloatingButton').checked,
-    useDummyData: document.getElementById('useDummyData').checked,
-    apiEndpoint: document.getElementById('apiEndpoint').value
   };
 
   chrome.storage.sync.set(settings, () => {
@@ -74,11 +65,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 초기화 버튼
   document.getElementById('resetBtn').addEventListener('click', resetSettings);
-
-  // Enter 키로 저장
-  document.getElementById('apiEndpoint').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      saveSettings();
-    }
-  });
 });

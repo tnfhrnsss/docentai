@@ -74,18 +74,20 @@ async function registerVideo(metadata) {
 function setupEventListeners() {
   console.log('🎧 이벤트 리스너 설정 중...');
 
-  // 2. 플로팅 버튼 클릭
-  ui.floatingButton.addEventListener('click', () => {
-    const currentSubtitle = detector.getCurrentSubtitle();
+  // 2. 플로팅 버튼 클릭 (플로팅 버튼이 있을 때만)
+  if (ui.floatingButton) {
+    ui.floatingButton.addEventListener('click', () => {
+      const currentSubtitle = detector.getCurrentSubtitle();
 
-    if (currentSubtitle) {
-      showActionPanel(currentSubtitle);
-    } else {
-      ui.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');
-    }
-  });
+      if (currentSubtitle) {
+        showActionPanel(currentSubtitle);
+      } else {
+        ui.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');
+      }
+    });
+  }
 
-  // 3. 단축키 (Ctrl+E / ⌘+E)
+  // 3. 단축키 (Ctrl+E / ⌘+E) - 일반 모드에서 작동
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
       e.preventDefault();
@@ -101,6 +103,27 @@ function setupEventListeners() {
 
   console.log('✅ 이벤트 리스너 설정 완료');
 }
+
+/**
+ * Background script로부터 메시지 수신 (전체화면 단축키용)
+ */
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('📨 메시지 수신:', request.type);
+
+  if (request.type === 'EXPLAIN_CURRENT_SUBTITLE') {
+    const currentSubtitle = detector?.getCurrentSubtitle();
+
+    if (currentSubtitle) {
+      showActionPanel(currentSubtitle);
+      sendResponse({ success: true });
+    } else {
+      ui?.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');
+      sendResponse({ success: false, reason: 'No subtitle available' });
+    }
+  }
+
+  return false;
+});
 
 function showActionPanel(text) {
   console.log(`📋 액션 패널 표시: "${text}"`);
@@ -224,7 +247,7 @@ function injectStyles() {
       50% { transform: translateY(-5px); }
     }
 
-    /* 스크롤바 스타일 */
+    /* 스크롤바 스타일 - 설명 패널 */
     #subtitle-explanation-panel::-webkit-scrollbar {
       width: 6px;
     }
@@ -240,6 +263,25 @@ function injectStyles() {
     }
 
     #subtitle-explanation-panel::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 215, 0, 0.7);
+    }
+
+    /* 스크롤바 스타일 - 액션 패널 */
+    .action-panel-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .action-panel-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .action-panel-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 215, 0, 0.5);
+      border-radius: 3px;
+    }
+
+    .action-panel-content::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 215, 0, 0.7);
     }
   `;
@@ -333,8 +375,15 @@ async function initVideoPage() {
   const metadata = await detector.detectVideo();
 
   if (metadata) {
-    // 플로팅 버튼 생성 (영상 재생 페이지에서만)
-    ui.createFloatingButton();
+    // showFloatingButton 설정 확인 후 플로팅 버튼 생성
+    chrome.storage.sync.get({ showFloatingButton: true }, (settings) => {
+      if (settings.showFloatingButton) {
+        ui.createFloatingButton();
+        console.log('💡 플로팅 버튼 생성 (설정: ON)');
+      } else {
+        console.log('💡 플로팅 버튼 숨김 (설정: OFF)');
+      }
+    });
 
     // 백엔드에 영상 등록
     await registerVideo(metadata);
@@ -357,3 +406,22 @@ if (document.readyState === 'loading') {
 
 // URL 변경 감지 시작
 watchUrlChanges();
+
+// 설정 변경 감지 (플로팅 버튼 표시/숨김)
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.showFloatingButton) {
+    const newValue = changes.showFloatingButton.newValue;
+    console.log('⚙️ showFloatingButton 설정 변경:', newValue);
+
+    if (newValue && !ui.floatingButton) {
+      // 설정이 켜졌고 버튼이 없으면 생성
+      ui.createFloatingButton();
+      console.log('💡 플로팅 버튼 생성');
+    } else if (!newValue && ui.floatingButton) {
+      // 설정이 꺼졌고 버튼이 있으면 제거
+      ui.floatingButton.remove();
+      ui.floatingButton = null;
+      console.log('💡 플로팅 버튼 제거');
+    }
+  }
+});

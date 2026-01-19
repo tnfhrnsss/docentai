@@ -339,7 +339,6 @@ class APIClient {
     });
 
     if (response.status === 202) {
-      // 처리 중
       const result = await response.json();
       const error = new Error(result.message);
       error.retryAfter = result.retryAfter;

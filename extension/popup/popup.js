@@ -25,25 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.runtime.openOptionsPage();
   });
 
-  // 테스트 버튼
-  const testBtn = document.getElementById('testBtn');
-  testBtn.addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          type: 'TEST_EXPLANATION'
-        }, (response) => {
-          if (chrome.runtime.lastError) {
-            console.error(i18n.t('popup.messageError'), chrome.runtime.lastError);
-            alert(i18n.t('popup.alertNetflixOnly'));
-          } else {
-            console.log('테스트 응답:', response);
-          }
-        });
-      }
-    });
-  });
-
   // 현재 탭이 넷플릭스인지 확인
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const currentUrl = tabs[0]?.url || '';

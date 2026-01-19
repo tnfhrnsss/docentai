@@ -5,6 +5,36 @@
 console.log('🔧 DocentAI Service Worker 로드됨');
 
 /**
+ * Command 리스너 (전체화면에서도 작동)
+ */
+chrome.commands.onCommand.addListener(async (command) => {
+  console.log('⌨️ 단축키 실행:', command);
+
+  if (command === 'explain-current-subtitle') {
+    try {
+      // 현재 활성 탭 가져오기
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!tab) {
+        console.error('❌ 활성 탭을 찾을 수 없습니다.');
+        return;
+      }
+
+      // Content script로 메시지 전송
+      chrome.tabs.sendMessage(tab.id, { type: 'EXPLAIN_CURRENT_SUBTITLE' }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError.message);
+        } else {
+          console.log('✅ Content script로 단축키 명령 전송 완료');
+        }
+      });
+    } catch (error) {
+      console.error('❌ 단축키 처리 오류:', error);
+    }
+  }
+});
+
+/**
  * 메시지 리스너
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
