@@ -77,9 +77,11 @@ function setupEventListeners() {
   // 2. 플로팅 버튼 클릭 (플로팅 버튼이 있을 때만)
   if (ui.floatingButton) {
     ui.floatingButton.addEventListener('click', () => {
+      console.log("clieck floating button...1");
       const currentSubtitle = detector.getCurrentSubtitle();
 
       if (currentSubtitle) {
+        console.log("clieck floating button...2 --" + currentSubtitle);
         showActionPanel(currentSubtitle);
       } else {
         ui.showToast(i18n.t('ui.noSubtitleAvailable') || '현재 표시된 자막이 없습니다.');

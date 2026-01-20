@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DocentAI - Subtitle Context Explainer",
   "version": "1.0.0",
-  "description": "넷플릭스 자막을 클릭하면 AI가 맥락을 설명해줍니다",
+  "description": "넷플릭스 자막을 통해 AI가 맥락을 설명해줍니다",
 
   "permissions": [
     "activeTab",
@@ -13,8 +13,7 @@
 
   "host_permissions": [
     "https://www.netflix.com/*",
-    "http://localhost:7777/*",
-    "<all_urls>"
+    "http://localhost:7777/*"
   ],
 
   "background": {
