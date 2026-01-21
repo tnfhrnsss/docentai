@@ -7,12 +7,11 @@
   "permissions": [
     "activeTab",
     "storage",
-    "tabs",
     "scripting"
   ],
 
   "host_permissions": [
-    "https://www.netflix.com/*",
+    "https://www.netflix.com/watch/*",
     "http://localhost:7777/*"
   ],
 
@@ -22,7 +21,7 @@
 
   "content_scripts": [
     {
-      "matches": ["https://www.netflix.com/*"],
+      "matches": ["https://www.netflix.com/watch/*"],
       "js": [
         "lib/i18n.js",
         "lib/api-client.js",
@@ -53,16 +52,6 @@
   },
 
   "options_page": "options/options.html",
-
-  "commands": {
-    "explain-current-subtitle": {
-      "suggested_key": {
-        "default": "Ctrl+E",
-        "mac": "Command+E"
-      },
-      "description": "현재 자막 설명"
-    }
-  },
 
   "icons": {
     "16": "assets/icons/favicon-16x16.png",

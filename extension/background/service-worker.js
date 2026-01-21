@@ -5,62 +5,23 @@
 console.log('🔧 DocentAI Service Worker 로드됨');
 
 /**
- * Command 리스너 (전체화면에서도 작동)
- */
-chrome.commands.onCommand.addListener(async (command) => {
-  console.log('⌨️ 단축키 실행:', command);
-
-  if (command === 'explain-current-subtitle') {
-    try {
-      // 현재 활성 탭 가져오기
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-      if (!tab) {
-        console.error('❌ 활성 탭을 찾을 수 없습니다.');
-        return;
-      }
-
-      // Content script로 메시지 전송
-      chrome.tabs.sendMessage(tab.id, { type: 'EXPLAIN_CURRENT_SUBTITLE' }, (response) => {
-        if (chrome.runtime.lastError) {
-          console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError.message);
-        } else {
-          console.log('✅ Content script로 단축키 명령 전송 완료');
-        }
-      });
-    } catch (error) {
-      console.error('❌ 단축키 처리 오류:', error);
-    }
-  }
-});
-
-/**
  * 메시지 리스너
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('📩 메시지 수신:', request.type, 'Sender:', sender);
 
   if (request.type === 'CAPTURE_SCREEN') {
-    // sender.tab이 없는 경우를 대비해 현재 활성 탭 가져오기
-    const getActiveTab = async () => {
-      if (sender.tab?.id) {
-        return sender.tab.id;
-      }
+    // sender.tab에서 windowId 가져오기
+    if (!sender.tab?.windowId) {
+      console.error('❌ 탭 정보를 찾을 수 없습니다.');
+      sendResponse({ error: '활성 탭을 찾을 수 없습니다.' });
+      return false;
+    }
 
-      // 현재 활성 탭 조회
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs.length > 0) {
-        return tabs[0].id;
-      }
+    const windowId = sender.tab.windowId;
+    console.log('🎯 캡처할 Window ID:', windowId);
 
-      throw new Error('활성 탭을 찾을 수 없습니다.');
-    };
-
-    getActiveTab()
-      .then(tabId => {
-        console.log('🎯 캡처할 탭 ID:', tabId);
-        return captureScreen(tabId);
-      })
+    captureScreen(windowId)
       .then(dataUrl => {
         console.log('✅ 화면 캡처 성공');
         sendResponse({ dataUrl });
@@ -78,16 +39,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 /**
  * 화면 캡처 함수
  */
-async function captureScreen(tabId) {
+async function captureScreen(windowId) {
   try {
-    console.log('🎯 화면 캡처 시도 중... Tab ID:', tabId);
+    console.log('🎯 화면 캡처 시도 중... Window ID:', windowId);
 
-    // 탭 정보 가져오기
-    const tab = await chrome.tabs.get(tabId);
-    console.log('📍 탭 정보:', tab.url, 'Window ID:', tab.windowId);
-
-    // windowId를 명시적으로 전달하여 화면 캡처
-    const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+    // activeTab 권한으로 화면 캡처
+    const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
       format: 'png'
     });
 
