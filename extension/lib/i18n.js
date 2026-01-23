@@ -21,7 +21,7 @@ class I18n {
     // 언어 파일 로드
     await this.loadLanguage(this.currentLang);
 
-    console.log(`💡 DocentAI i18n initialized: ${this.currentLang}`);
+    //console.log(`💡 DocentAI i18n initialized: ${this.currentLang}`);
   }
 
   /**
