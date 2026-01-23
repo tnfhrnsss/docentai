@@ -371,24 +371,7 @@ class UIComponents {
           </div>
 
           <div>
-            <button id="capture-screen-btn" style="
-              width: 100%;
-              padding: 10px;
-              background: rgba(255, 255, 255, 0.1);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              border-radius: 6px;
-              color: white;
-              cursor: pointer;
-              font-size: 13px;
-              transition: all 0.2s;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 6px;
-              margin-bottom: 12px;
-            ">
-              📸 화면 캡처
-            </button>
+            <!-- 캡처 버튼은 동적으로 추가됩니다 (capture-feature.js 로드 시) -->
 
             <div id="image-preview-container" style="
               display: none;
@@ -465,19 +448,9 @@ class UIComponents {
     this.actionPanel = panel;
 
     // 버튼 호버 효과
-    const captureBtn = panel.querySelector('#capture-screen-btn');
     const explainBtn = panel.querySelector('#explain-btn');
     const cancelBtn = panel.querySelector('#cancel-btn');
     const removeImageBtn = panel.querySelector('#remove-image-btn');
-
-    captureBtn.addEventListener('mouseenter', () => {
-      captureBtn.style.background = 'rgba(255, 255, 255, 0.15)';
-      captureBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-    });
-    captureBtn.addEventListener('mouseleave', () => {
-      captureBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-      captureBtn.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-    });
 
     explainBtn.addEventListener('mouseenter', () => {
       explainBtn.style.transform = 'translateY(-2px)';
@@ -511,9 +484,6 @@ class UIComponents {
     closeBtn.addEventListener('mouseleave', (e) => {
       e.target.style.color = '#999';
     });
-
-    // 화면 캡처 버튼
-    captureBtn.addEventListener('click', () => this.captureScreen());
 
     // 이미지 제거 버튼
     removeImageBtn.addEventListener('click', () => {
@@ -584,109 +554,9 @@ class UIComponents {
   }
 
   /**
-   * 화면 캡처
+   * 화면 캡처 메서드는 capture-feature.js에서 동적으로 추가됩니다.
+   * 프로덕션 빌드에서는 capture-feature.js가 제외되므로 이 기능이 비활성화됩니다.
    */
-  async captureScreen() {
-    if (!this.actionPanel) {
-      this.showToast('액션 패널을 찾을 수 없습니다.');
-      return;
-    }
-
-    // Extension context 유효성 체크
-    if (!chrome.runtime || !chrome.runtime.id) {
-      console.error('❌ Extension context invalidated');
-      this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
-      return;
-    }
-
-    console.log('📸 화면 캡처 준비: UI 요소 숨김');
-
-    // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
-    const originalPanelDisplay = this.actionPanel.style.display;
-    this.actionPanel.style.display = 'none';
-
-    const originalButtonDisplay = this.floatingButton?.style.display;
-    if (this.floatingButton) {
-      this.floatingButton.style.display = 'none';
-    }
-
-    // UI 복구 함수 (무조건 복구되도록 보장)
-    const restoreUI = () => {
-      console.log('🔄 UI 복구 중...');
-      if (this.actionPanel) {
-        this.actionPanel.style.display = originalPanelDisplay;
-      }
-      if (this.floatingButton) {
-        this.floatingButton.style.display = originalButtonDisplay || '';
-      }
-    };
-
-    // 타임아웃 설정 (5초 후 무조건 UI 복구)
-    const timeoutId = setTimeout(() => {
-      console.warn('⏱️ 화면 캡처 타임아웃 - UI 강제 복구');
-      restoreUI();
-      this.showToast('화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.');
-    }, 5000);
-
-    try {
-      // 2. 화면이 완전히 렌더링되도록 약간 대기
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // 3. 화면 캡처 요청
-      chrome.runtime.sendMessage(
-        { type: 'CAPTURE_SCREEN' },
-        (response) => {
-          // 타임아웃 취소
-          clearTimeout(timeoutId);
-
-          // 4. 캡처 완료 후 UI 요소 다시 표시
-          restoreUI();
-
-          if (chrome.runtime.lastError) {
-            console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError);
-
-            // Extension context invalidated 에러 특별 처리
-            if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
-              this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
-            } else {
-              this.showToast(`화면 캡처에 실패했습니다: ${chrome.runtime.lastError.message}`);
-            }
-            return;
-          }
-
-          if (response && response.error) {
-            console.error('❌ 화면 캡처 실패:', response.error);
-            this.showToast(`화면 캡처에 실패했습니다: ${response.error}`);
-            return;
-          }
-
-          if (response && response.dataUrl) {
-            console.log('✅ 화면 캡처 성공');
-            this.selectedImage = response.dataUrl;
-            this.showImagePreview(response.dataUrl);
-          } else {
-            console.error('❌ 응답 데이터 없음:', response);
-            this.showToast('화면 캡처에 실패했습니다: 응답 데이터 없음');
-          }
-        }
-      );
-    } catch (error) {
-      console.error('❌ 화면 캡처 예외:', error);
-
-      // 타임아웃 취소
-      clearTimeout(timeoutId);
-
-      // 에러 발생 시에도 UI 요소 복구
-      restoreUI();
-
-      // Extension context invalidated 에러 특별 처리
-      if (error.message && error.message.includes('Extension context invalidated')) {
-        this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
-      } else {
-        this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
-      }
-    }
-  }
 
   /**
    * 소스 아이콘 가져오기
