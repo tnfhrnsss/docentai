@@ -6,6 +6,9 @@ class NetflixDetector {
     this.currentVideoId = null;
     this.metadata = null;
     this.netflixPlayer = null;
+    this.subtitleObserver = null; // 자막 변경 감지용 MutationObserver
+    this.onSubtitleChangeCallback = null; // 자막 변경 시 호출될 콜백
+    this.lastSubtitle = null; // 마지막 자막 (중복 방지)
   }
 
   /**
@@ -449,7 +452,7 @@ class NetflixDetector {
       // URL에서 videoId 추출
       const videoId = this.extractVideoIdFromURL();
 
-      if (!videoId) {
+      if (!videoId)  {
         console.log('❌ videoId를 찾을 수 없습니다. URL:', window.location.href);
         return null;
       }
@@ -565,5 +568,67 @@ class NetflixDetector {
       return video.currentTime;
     }
     return 0;
+  }
+
+  /**
+   * 자막 변경 감지 시작
+   * @param {Function} callback - 자막 변경 시 호출될 콜백 (text, timestamp)
+   */
+  startSubtitleObserver(callback) {
+    console.log('👀 자막 변경 감지 시작...');
+
+    this.onSubtitleChangeCallback = callback;
+
+    // 기존 옵저버가 있으면 정리
+    if (this.subtitleObserver) {
+      this.subtitleObserver.disconnect();
+    }
+
+    // 자막 컨테이너 찾기
+    const container = this.getSubtitleContainer();
+    if (!container) {
+      console.log('⚠️ 자막 컨테이너를 찾을 수 없습니다. 3초 후 재시도...');
+      setTimeout(() => this.startSubtitleObserver(callback), 3000);
+      return;
+    }
+
+    console.log('✅ 자막 컨테이너 발견:', container);
+
+    // MutationObserver 생성
+    this.subtitleObserver = new MutationObserver((mutations) => {
+      const currentSubtitle = this.getCurrentSubtitle();
+      const currentTime = this.getCurrentTime();
+
+      // 자막이 변경되었고, 이전 자막과 다른 경우에만 콜백 호출
+      if (currentSubtitle && currentSubtitle !== this.lastSubtitle) {
+        console.log(`🔄 자막 변경 감지: "${currentSubtitle}" (${currentTime.toFixed(1)}s)`);
+        this.lastSubtitle = currentSubtitle;
+
+        // 콜백 호출
+        if (this.onSubtitleChangeCallback) {
+          this.onSubtitleChangeCallback(currentSubtitle, currentTime);
+        }
+      }
+    });
+
+    // 자막 컨테이너 감시 시작
+    this.subtitleObserver.observe(container, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
+    console.log('✅ 자막 변경 감지 시작됨');
+  }
+
+  /**
+   * 자막 변경 감지 중지
+   */
+  stopSubtitleObserver() {
+    if (this.subtitleObserver) {
+      this.subtitleObserver.disconnect();
+      this.subtitleObserver = null;
+      console.log('🛑 자막 변경 감지 중지');
+    }
   }
 }

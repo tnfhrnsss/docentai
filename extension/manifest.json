@@ -27,6 +27,7 @@
         "lib/api-client.js",
         "utils/imageIO-utils.js",
         "content/netflix-detector.js",
+        "content/subtitle-cache.js",
         "content/ui-components.js",
         "content/content.js"
       ],

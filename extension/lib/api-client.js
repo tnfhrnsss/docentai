@@ -230,84 +230,10 @@ class APIClient {
   async explainSubtitle(data) {
     console.log('📤 [API] 자막 설명 요청:', {
       ...data,
-      imageId: data.imageId || '없음'
+      imageId: data.imageId || '없음',
+      contextCount: data.context?.length || 0,
+      currentNonVerbalCues: data.currentSubtitle?.nonVerbalCues || []
     });
-
-    if (this.USE_DUMMY) {
-      // 더미 응답 시뮬레이션 (캐시 여부에 따라 지연 시간 다르게)
-      const isCached = Math.random() > 0.5;
-      const delay = isCached ? 25 : 2300;
-
-      await this._delay(delay);
-
-      // 더미 설명 데이터
-      const dummyExplanations = [
-        {
-          text: `"${data.selectedText}"는 주인공이 과거 타임슬립을 통해 만난 인물을 언급하는 장면입니다. 이전 에피소드에서 등장한 핵심 복선이 풀리는 순간이에요.${data.imageId ? ' (이미지 분석: 주인공의 표정이 놀라움과 슬픔을 동시에 나타내고 있습니다.)' : ''}`,
-          sources: [
-            {
-              type: 'namuwiki',
-              title: '나무위키 - 작품 분석'
-            },
-            {
-              type: 'video_analysis',
-              title: '영상 자막 분석'
-            }
-          ],
-          references: [
-            {
-              timestamp: data.timestamp - 300,
-              description: '5분 전 - 관련 복선 장면'
-            }
-          ],
-          cached: isCached,
-          responseTime: delay
-        },
-        {
-          text: `이 대사는 주인공의 과거 회상 장면과 연결됩니다. "${data.selectedText}"를 통해 등장인물 간의 숨겨진 관계가 드러나는 중요한 순간입니다.${data.imageId ? ' (이미지 분석: 배경에서 의미심장한 소품들이 보입니다.)' : ''}`,
-          sources: [
-            {
-              type: 'wikipedia',
-              title: '위키백과 - 줄거리'
-            }
-          ],
-          references: [],
-          cached: isCached,
-          responseTime: delay
-        },
-        {
-          text: `"${data.selectedText}"는 이 작품의 핵심 주제를 상징하는 대사입니다. 등장인물의 내면 갈등과 성장을 보여주는 장면으로, 전체 서사에서 중요한 전환점이 됩니다.${data.imageId ? ' (이미지 분석: 화면의 조명과 색감이 극적인 분위기를 연출하고 있습니다.)' : ''}`,
-          sources: [
-            {
-              type: 'fandom',
-              title: '팬덤 위키 - 캐릭터 분석'
-            },
-            {
-              type: 'video_analysis',
-              title: '대사 맥락 분석'
-            }
-          ],
-          references: [
-            {
-              timestamp: data.timestamp - 600,
-              description: '10분 전 - 복선 등장'
-            },
-            {
-              timestamp: data.timestamp + 120,
-              description: '2분 후 - 결과 확인'
-            }
-          ],
-          cached: isCached,
-          responseTime: delay
-        }
-      ];
-
-      // 랜덤하게 하나 선택
-      const response = dummyExplanations[Math.floor(Math.random() * dummyExplanations.length)];
-
-      console.log(`📥 [API] 자막 설명 응답 (${isCached ? '캐시 HIT' : '캐시 MISS'}, ${delay}ms):`, response);
-      return response;
-    }
 
     // 실제 API 호출
     const requestBody = {
@@ -319,6 +245,16 @@ class APIClient {
     // 이미지 ID가 있으면 추가
     if (data.imageId) {
       requestBody.imageId = data.imageId;
+    }
+
+    // 컨텍스트 데이터가 있으면 추가 (이전 자막들)
+    if (data.context && Array.isArray(data.context)) {
+      requestBody.context = data.context;
+    }
+
+    // 현재 자막 정보가 있으면 추가
+    if (data.currentSubtitle) {
+      requestBody.currentSubtitle = data.currentSubtitle;
     }
 
     // 인증 토큰 확인

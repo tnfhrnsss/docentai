@@ -29,6 +29,7 @@
         "lib/api-client.js"
         {{CAPTURE_UTILS}},
         "content/netflix-detector.js",
+        "content/subtitle-cache.js",
         "content/ui-components.js"
         {{CAPTURE_FEATURE}},
         "content/content.js"

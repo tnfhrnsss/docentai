@@ -133,6 +133,7 @@ def build(mode):
         ('extension/lang', f'{build_dir}/lang'),
         # Content Scripts
         ('extension/content/netflix-detector.js', f'{build_dir}/content/netflix-detector.js'),
+        ('extension/content/subtitle-cache.js', f'{build_dir}/content/subtitle-cache.js'),
         ('extension/content/ui-components.js', f'{build_dir}/content/ui-components.js'),
         ('extension/content/content.js', f'{build_dir}/content/content.js'),
         ('extension/content/styles.css', f'{build_dir}/content/styles.css'),

@@ -1,6 +1,7 @@
 let detector = null;
 let apiClient = null;
 let ui = null;
+let subtitleCache = null; // 자막 캐시 매니저
 
 async function init() {
   console.log('🚀 DocentAI 초기화 중...');
@@ -12,6 +13,7 @@ async function init() {
   detector = new NetflixDetector();
   apiClient = new APIClient('http://localhost:8001');
   ui = new UIComponents();
+  subtitleCache = new SubtitleCacheManager(5); // 최근 5개 자막 캐시
 
   // CSS 애니메이션 주입
   injectStyles();
@@ -164,13 +166,19 @@ async function explainSubtitle(text, x, y, imageData = null) {
       ui.updateExplanationPanelStatus('분석 중...');
     }
 
-    // 2단계: 자막 설명 요청 (imageId 포함)
+    // 2단계: 컨텍스트 데이터 생성 (현재 자막 + 이전 자막들)
+    const currentTime = detector.getCurrentTime() || 0;
+    const contextData = subtitleCache.getContextForAPI(text, currentTime, 3);
+
+    // 3단계: 자막 설명 요청 (imageId 포함)
     const explanation = await apiClient.explainSubtitle({
       videoId: metadata.videoId,
       selectedText: text,
       metadata: metadata,
-      timestamp: detector.getCurrentTime() || 0, // 현재 재생 시간
-      imageId: imageId // 이미지 ID 추가
+      timestamp: currentTime, // 현재 재생 시간
+      imageId: imageId, // 이미지 ID 추가
+      context: contextData.context, // 이전 자막들 (문맥)
+      currentSubtitle: contextData.currentSubtitle // 현재 자막
     });
 
     console.log(`⚡ 응답 시간: ${explanation.responseTime}ms`);
@@ -377,6 +385,14 @@ async function initVideoPage() {
   const metadata = await detector.detectVideo();
 
   if (metadata) {
+    // 자막 캐시 초기화 (새로운 영상)
+    subtitleCache.clear(metadata.videoId);
+
+    // 자막 변경 감지 시작 (캐시 업데이트용)
+    detector.startSubtitleObserver((text, timestamp) => {
+      subtitleCache.addSubtitle(text, timestamp);
+    });
+
     // showFloatingButton 설정 확인 후 플로팅 버튼 생성
     chrome.storage.sync.get({ showFloatingButton: true }, (settings) => {
       if (settings.showFloatingButton) {
