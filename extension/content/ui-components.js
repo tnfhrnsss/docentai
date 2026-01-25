@@ -210,14 +210,12 @@ class UIComponents {
     content.innerHTML = `
       <div style="
         margin-bottom: 16px;
-        white-space: pre-wrap;
+        white-space: pre-line;
         word-wrap: break-word;
         max-height: calc(1.7em * 4 + 8px);
         overflow-y: auto;
         padding-right: 8px;
-      ">
-        ${explanation.text}
-      </div>
+      ">${explanation.text.trim()}</div>
 
       ${explanation.references && explanation.references.length > 0 ? `
         <div style="

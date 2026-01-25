@@ -18,7 +18,7 @@
     "footer": "For a better viewing experience",
     "messageError": "Message sending failed:",
     "fullscreenNoticeTitle": "⚠️ Fullscreen Mode",
-    "fullscreenNoticeDesc": "The 💡 button is not visible in fullscreen, but the shortcut key (Ctrl+E / ⌘+E) works normally."
+    "fullscreenNoticeDesc": "Fullscreen is not supported."
   },
 
   "options": {
@@ -54,5 +54,11 @@
     "videoAnalyzing": "Analyzing Video",
     "pleaseWait": "Please wait...",
     "progress": "Progress"
+  },
+
+  "errors": {
+    "networkError": "Cannot connect to the server. Please try again later.",
+    "retryLater": "A temporary error occurred. Please try again later.",
+    "profileIdNotFound": "Netflix profile information not found. Please make sure you are logged in to Netflix."
   }
 }

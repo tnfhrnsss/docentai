@@ -47,7 +47,7 @@ class APIClient {
     try {
       const profileId = localStorage.getItem('MDX_PROFILEID');
       if (!profileId) {
-        throw new Error('Netflix Profile ID를 찾을 수 없습니다. Netflix에 로그인되어 있는지 확인하세요.');
+        throw new Error(i18n.t('errors.profileIdNotFound'));
       }
       return profileId;
     } catch (error) {
@@ -63,19 +63,35 @@ class APIClient {
   async _fetchToken() {
     const profileId = this._getProfileId();
 
-    const response = await fetch(`${this.baseURL}/api/auth/token`, {
-      method: 'POST',
-      headers: {
-        'X-Profile-ID': profileId
+    try {
+      const response = await fetch(`${this.baseURL}/api/auth/token`, {
+        method: 'POST',
+        headers: {
+          'X-Profile-ID': profileId
+        }
+      });
+
+      if (!response.ok) {
+        console.error(`❌ 토큰 발급 실패: ${response.status}`);
+        throw new Error(i18n.t('errors.retryLater'));
       }
-    });
 
-    if (!response.ok) {
-      throw new Error(`토큰 발급 실패: ${response.status}`);
+      const { token, expiresAt } = await response.json();
+
+      // ISO 8601 문자열을 밀리초 timestamp로 변환
+      const expiresAtMs = typeof expiresAt === 'string'
+        ? new Date(expiresAt).getTime()
+        : expiresAt;
+
+      return { token, expiresAt: expiresAtMs };
+    } catch (error) {
+      // 네트워크 오류 처리
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('❌ 네트워크 오류:', error);
+        throw new Error(i18n.t('errors.networkError'));
+      }
+      throw error;
     }
-
-    const { token, expiresAt } = await response.json();
-    return { token, expiresAt };
   }
 
   /**
@@ -85,9 +101,14 @@ class APIClient {
     return new Promise((resolve) => {
       chrome.storage.local.get(['authToken', 'tokenExpiry'], (result) => {
         if (result.authToken && result.tokenExpiry) {
+          // ISO 8601 문자열을 밀리초 timestamp로 변환
+          const expiresAtMs = typeof result.tokenExpiry === 'string'
+            ? new Date(result.tokenExpiry).getTime()
+            : result.tokenExpiry;
+
           resolve({
             token: result.authToken,
-            expiresAt: result.tokenExpiry
+            expiresAt: expiresAtMs
           });
         } else {
           resolve(null);
@@ -132,28 +153,38 @@ class APIClient {
       return response;
     }
 
-    // 인증 토큰 확인
-    const token = await this._ensureAuthenticated();
+    try {
+      // 인증 토큰 확인
+      const token = await this._ensureAuthenticated();
 
-    const headers = {
-      'Content-Type': 'application/json'
-    };
+      const headers = {
+        'Content-Type': 'application/json'
+      };
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${this.baseURL}/api/videos`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(metadata)
+      });
+
+      if (!response.ok) {
+        console.error(`❌ 영상 등록 실패: ${response.status}`);
+        throw new Error(i18n.t('errors.retryLater'));
+      }
+
+      return await response.json();
+    } catch (error) {
+      // 네트워크 오류 처리
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('❌ 네트워크 오류:', error);
+        throw new Error(i18n.t('errors.networkError'));
+      }
+      throw error;
     }
-
-    const response = await fetch(`${this.baseURL}/api/videos`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(metadata)
-    });
-
-    if (!response.ok) {
-      throw new Error(`API 오류: ${response.status}`);
-    }
-
-    return await response.json();
   }
 
   /**
@@ -179,49 +210,59 @@ class APIClient {
       return response;
     }
 
-    // 실제 API 호출 시 이미지 압축
-    const compressStart = performance.now();
-    console.log('🔄 이미지 압축 중... (원본 크기:', Math.floor(originalSize / 1024), 'KB)');
+    try {
+      // 실제 API 호출 시 이미지 압축
+      const compressStart = performance.now();
+      console.log('🔄 이미지 압축 중... (원본 크기:', Math.floor(originalSize / 1024), 'KB)');
 
-    imageData = await ImageIOUtils._compressImage(imageData, 640, 360, 0.8);
+      imageData = await ImageIOUtils._compressImage(imageData, 640, 360, 0.8);
 
-    const compressTime = performance.now() - compressStart;
-    const compressedSize = imageData.length;
-    const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+      const compressTime = performance.now() - compressStart;
+      const compressedSize = imageData.length;
+      const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
 
-    console.log(`✅ 압축 완료: ${Math.floor(compressedSize / 1024)}KB (${compressionRatio}% 감소, ${compressTime.toFixed(0)}ms)`);
+      console.log(`✅ 압축 완료: ${Math.floor(compressedSize / 1024)}KB (${compressionRatio}% 감소, ${compressTime.toFixed(0)}ms)`);
 
-    // Base64를 Blob으로 변환
-    const base64Data = imageData.split(',')[1];
-    const blob = ImageIOUtils._base64ToBlob(base64Data, 'image/jpeg');
+      // Base64를 Blob으로 변환
+      const base64Data = imageData.split(',')[1];
+      const blob = ImageIOUtils._base64ToBlob(base64Data, 'image/jpeg');
 
-    const formData = new FormData();
-    formData.append('image', blob, 'screenshot.jpg');
+      const formData = new FormData();
+      formData.append('image', blob, 'screenshot.jpg');
 
-    // 인증 토큰 확인
-    const token = await this._ensureAuthenticated();
+      // 인증 토큰 확인
+      const token = await this._ensureAuthenticated();
 
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const uploadStart = performance.now();
+      const response = await fetch(`${this.baseURL}/api/upload/${videoId}`, {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+
+      if (!response.ok) {
+        console.error(`❌ 이미지 업로드 실패: ${response.status}`);
+        throw new Error(i18n.t('errors.retryLater'));
+      }
+
+      const uploadTime = performance.now() - uploadStart;
+      const totalTime = performance.now() - startTime;
+      console.log(`⏱️ 업로드 시간: ${uploadTime.toFixed(0)}ms, 총 시간: ${totalTime.toFixed(0)}ms`);
+
+      return await response.json();
+    } catch (error) {
+      // 네트워크 오류 처리
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('❌ 네트워크 오류:', error);
+        throw new Error(i18n.t('errors.networkError'));
+      }
+      throw error;
     }
-
-    const uploadStart = performance.now();
-    const response = await fetch(`${this.baseURL}/api/upload/${videoId}`, {
-      method: 'POST',
-      headers,
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error(`이미지 업로드 오류: ${response.status}`);
-    }
-
-    const uploadTime = performance.now() - uploadStart;
-    const totalTime = performance.now() - startTime;
-    console.log(`⏱️ 업로드 시간: ${uploadTime.toFixed(0)}ms, 총 시간: ${totalTime.toFixed(0)}ms`);
-
-    return await response.json();
   }
 
   /**
@@ -235,71 +276,82 @@ class APIClient {
       currentNonVerbalCues: data.currentSubtitle?.nonVerbalCues || []
     });
 
-    // 실제 API 호출
-    const requestBody = {
-      language: navigator.language || navigator.languages?.[0] || 'en',
-      selectedText: data.selectedText,
-      timestamp: data.timestamp
-    };
+    try {
+      // 실제 API 호출
+      const requestBody = {
+        language: navigator.language || navigator.languages?.[0] || 'en',
+        selectedText: data.selectedText,
+        timestamp: data.timestamp
+      };
 
-    // 이미지 ID가 있으면 추가
-    if (data.imageId) {
-      requestBody.imageId = data.imageId;
-    }
+      // 이미지 ID가 있으면 추가
+      if (data.imageId) {
+        requestBody.imageId = data.imageId;
+      }
 
-    // 컨텍스트 데이터가 있으면 추가 (이전 자막들)
-    if (data.context && Array.isArray(data.context)) {
-      requestBody.context = data.context;
-    }
+      // 컨텍스트 데이터가 있으면 추가 (이전 자막들)
+      if (data.context && Array.isArray(data.context)) {
+        requestBody.context = data.context;
+      }
 
-    // 현재 자막 정보가 있으면 추가
-    if (data.currentSubtitle) {
-      requestBody.currentSubtitle = data.currentSubtitle;
-    }
+      // 현재 자막 정보가 있으면 추가
+      if (data.currentSubtitle) {
+        requestBody.currentSubtitle = data.currentSubtitle;
+      }
 
-    // 인증 토큰 확인
-    const token = await this._ensureAuthenticated();
+      // 인증 토큰 확인
+      const token = await this._ensureAuthenticated();
 
-    const headers = {
-      'Content-Type': 'application/json'
-    };
+      const headers = {
+        'Content-Type': 'application/json'
+      };
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
-    const response = await fetch(`${this.baseURL}/api/explanations/videos/${data.videoId}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(requestBody)
-    });
+      const response = await fetch(`${this.baseURL}/api/explanations/videos/${data.videoId}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(requestBody)
+      });
 
-    if (response.status === 202) {
+      if (response.status === 202) {
+        const result = await response.json();
+        const error = new Error(result.message);
+        error.retryAfter = result.retryAfter;
+        throw error;
+      }
+
+      if (!response.ok) {
+        console.error(`❌ 자막 설명 요청 실패: ${response.status}`);
+        throw new Error(i18n.t('errors.retryLater'));
+      }
+
       const result = await response.json();
-      const error = new Error(result.message);
-      error.retryAfter = result.retryAfter;
+
+      // 응답 형식 변환 (백엔드 응답 형식에 맞춰 파싱)
+      if (result.success && result.data && result.data.explanation) {
+        return {
+          text: result.data.explanation.text,
+          sources: result.data.explanation.sources || [],
+          references: result.data.explanation.references || [],
+          cached: result.data.cached || false,
+          responseTime: result.data.responseTime || 0
+        };
+      }
+
+      // 에러 응답 처리
+      console.error('❌ 응답 파싱 실패:', result);
+      throw new Error(i18n.t('errors.retryLater'));
+    } catch (error) {
+      // 네트워크 오류 처리
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('❌ 네트워크 오류:', error);
+        throw new Error(i18n.t('errors.networkError'));
+      }
       throw error;
     }
-
-    if (!response.ok) {
-      throw new Error(`API 오류: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    // 응답 형식 변환 (백엔드 응답 형식에 맞춰 파싱)
-    if (result.success && result.data && result.data.explanation) {
-      return {
-        text: result.data.explanation.text,
-        sources: result.data.explanation.sources || [],
-        references: result.data.explanation.references || [],
-        cached: result.data.cached || false,
-        responseTime: result.data.responseTime || 0
-      };
-    }
-
-    // 에러 응답 처리
-    throw new Error(result.message || result.error || '알 수 없는 오류');
   }
 
   /**
@@ -322,24 +374,34 @@ class APIClient {
       return response;
     }
 
-    // 인증 토큰 확인
-    const token = await this._ensureAuthenticated();
+    try {
+      // 인증 토큰 확인
+      const token = await this._ensureAuthenticated();
 
-    const headers = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // 실제 API 호출
+      const response = await fetch(`${this.baseURL}/api/video/${videoId}/status`, {
+        headers
+      });
+
+      if (!response.ok) {
+        console.error(`❌ 영상 상태 확인 실패: ${response.status}`);
+        throw new Error(i18n.t('errors.retryLater'));
+      }
+
+      return await response.json();
+    } catch (error) {
+      // 네트워크 오류 처리
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('❌ 네트워크 오류:', error);
+        throw new Error(i18n.t('errors.networkError'));
+      }
+      throw error;
     }
-
-    // 실제 API 호출
-    const response = await fetch(`${this.baseURL}/api/video/${videoId}/status`, {
-      headers
-    });
-
-    if (!response.ok) {
-      throw new Error(`API 오류: ${response.status}`);
-    }
-
-    return await response.json();
   }
 
   /**
