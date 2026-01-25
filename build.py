@@ -56,6 +56,31 @@ def copy_file(src, dest):
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     shutil.copy2(src, dest)
 
+def generate_config(mode, build_dir):
+    """빌드 모드에 따라 config.js 생성"""
+    template_path = 'extension/lib/config.template.js'
+
+    with open(template_path, 'r', encoding='utf-8') as f:
+        template = f.read()
+
+    # API URL 설정
+    if mode == 'dev':
+        api_url = 'http://localhost:8001'
+    else:
+        api_url = 'https://docentai-api-1064006289042.asia-northeast3.run.app'
+
+    # 플레이스홀더 치환
+    config_content = template.replace('{{API_URL}}', api_url)
+    config_content = config_content.replace('{{BUILD_MODE}}', mode)
+
+    # 생성된 config.js 저장
+    config_path = os.path.join(build_dir, 'lib/config.js')
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    with open(config_path, 'w', encoding='utf-8') as f:
+        f.write(config_content)
+
+    print(f'✓ Generated lib/config.js (mode: {mode}, API: {api_url})')
+
 def generate_manifest(mode, build_dir):
     """빌드 모드에 따라 manifest.json 생성"""
     template_path = 'extension/manifest.template.json'
@@ -113,13 +138,16 @@ def build(mode):
     # 1. 빌드 디렉토리 초기화
     build_dir = clean_build_dir()
 
-    # 2. manifest.json 생성
+    # 2. Config 생성 (환경 설정)
+    generate_config(mode, build_dir)
+
+    # 3. manifest.json 생성
     generate_manifest(mode, build_dir)
 
-    # 3. Service Worker 병합
+    # 4. Service Worker 병합
     merge_service_worker(mode, build_dir)
 
-    # 4. 공통 파일 복사
+    # 5. 공통 파일 복사
     files_to_copy = [
         # Popup
         ('extension/popup', f'{build_dir}/popup'),
@@ -127,8 +155,6 @@ def build(mode):
         ('extension/options', f'{build_dir}/options'),
         # Assets
         ('extension/assets', f'{build_dir}/assets'),
-        # Library
-        ('extension/lib', f'{build_dir}/lib'),
         # Language files
         ('extension/lang', f'{build_dir}/lang'),
         # Content Scripts
@@ -149,7 +175,11 @@ def build(mode):
         else:
             print(f'✗ Missing: {src}')
 
-    # 5. 빌드 모드별 추가 파일
+    # Library 파일 복사 (config.template.js 제외)
+    copy_directory('extension/lib', f'{build_dir}/lib', exclude_patterns=['config.template.js'])
+    print(f'✓ Copied directory: extension/lib (excluded: config.template.js)')
+
+    # 6. 빌드 모드별 추가 파일
     if mode == 'dev':
         # 개발 모드: 캡처 기능 파일 포함
         capture_files = [
@@ -168,7 +198,7 @@ def build(mode):
     else:
         print('\n🚫 Screen capture feature disabled (PROD MODE)')
 
-    # 6. ZIP 파일 생성
+    # 7. ZIP 파일 생성
     create_zip(mode, build_dir)
 
     print(f'\n✅ Build completed successfully!')

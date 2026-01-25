@@ -17,7 +17,11 @@ async function init() {
     // 인스턴스 생성
     console.log('🏗️ 인스턴스 생성 중...');
     detector = new NetflixDetector();
-    apiClient = new APIClient('http://localhost:8001');
+
+    // 환경별 API URL 사용
+    const apiUrl = window.DocentAIConfig?.API_URL || 'http://localhost:8001';
+    apiClient = new APIClient(apiUrl);
+
     ui = new UIComponents();
     subtitleCache = new SubtitleCacheManager(5); // 최근 5개 자막 캐시
     console.log('✅ 인스턴스 생성 완료');
