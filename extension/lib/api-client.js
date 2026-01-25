@@ -281,7 +281,9 @@ class APIClient {
       const requestBody = {
         language: navigator.language || navigator.languages?.[0] || 'en',
         selectedText: data.selectedText,
-        timestamp: data.timestamp
+        timestamp: data.timestamp,
+        title: data.metadata?.title || '',
+        platform: data.metadata?.platform || ''
       };
 
       // 이미지 ID가 있으면 추가
