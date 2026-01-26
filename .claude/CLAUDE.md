@@ -12,33 +12,35 @@
 - 1차: Netflix
 - 2차 확장 계획: YouTube, Disney+, Wavve
 
-## 최근 업데이트 (2026-01-12)
+## 최근 업데이트 (2026-01-26)
 
-### 화면 캡처 기능 개선
+### Netflix SPA 라우팅 완벽 지원 (Boot 패턴 적용)
 
-**1. 권한 설정 수정**
-- manifest.json에 `<all_urls>` 권한 추가 (화면 캡처 필수)
-- `scripting` 권한 추가
-- Chrome 설치 시 "모든 사이트의 데이터 읽고 변경" 권한 요청 표시됨
+**1. Boot 패턴 도입**
+- `boot()` 함수: watch 페이지일 때만 초기화 진행
+- `initGlobal()`: 전역 초기화 (i18n, 인스턴스 생성, 단축키 등록) - 한 번만 실행
+- `initVideoPage()`: 영상 페이지 초기화 (메타데이터 추출, 플로팅 버튼 생성 등)
+- videoId 기반 중복 초기화 방지: 같은 영상에서는 재초기화 스킵
 
-**2. Background Service Worker 개선**
-- 활성 탭 자동 감지 로직 추가 (`sender.tab` 또는 `chrome.tabs.query`)
-- 탭의 windowId를 명시적으로 전달하여 캡처 안정성 향상
-- 상세한 에러 메시지 제공:
-  - 권한 부족: Extension 재로드 안내
-  - Netflix DRM 보호: 파일 선택 방식 사용 안내
-  - 기타 보안 정책 차단 안내
+**2. SPA 네비게이션 감지 강화**
+- History API 패치 (pushState, replaceState)
+- popstate 이벤트 (뒤로가기/앞으로가기)
+- 주기적 체크 (500ms 간격) - Netflix는 이 방법이 필수
+- Netflix 홈 → watch 페이지 이동 시 새로고침 없이 즉시 동작
 
-**3. UIComponents 화면 캡처 로직 개선**
-- 캡처 시 액션 패널과 플로팅 버튼을 일시적으로 숨김
-- 100ms 렌더링 대기 후 캡처하여 깨끗한 이미지 확보
-- 캡처 완료 또는 에러 발생 시 UI 요소 자동 복구
-- `chrome.runtime.lastError` 및 응답 에러 철저히 체크
-- 사용자 친화적인 토스트 메시지 표시
+**3. manifest.json 최적화**
+- `matches`: `https://www.netflix.com/*` (전체 페이지에서 content script 로드)
+- `host_permissions`: `/watch/*` 유지 (Chrome Web Store 승인용)
+- `run_at`: `document_end` (DOM 로드 후 실행)
 
-**4. 디버깅 향상**
-- Service Worker 콘솔 로그 개선 (🎯, 📍, ✅, ❌ 이모지 사용)
-- 탭 ID, Window ID, 에러 상세 정보 로깅
+**4. 비디오 요소 대기 최적화**
+- 10초 타임아웃 → 2초로 단축
+- 타임아웃 로그 제거 (조용히 진행)
+- duration은 JSON-LD/meta 태그에서 추출 가능하므로 video 요소 필수 아님
+
+**5. Background Service Worker 단순화**
+- manifest의 content_scripts가 자동으로 로드하므로 수동 주입 로직 제거
+- 설치/업데이트 시 로그만 출력
 
 **알려진 제약사항:**
 - Netflix DRM 보호로 인해 일부 환경에서 화면 캡처가 차단될 수 있음
@@ -211,26 +213,21 @@ subtitle-explainer-extension/
 백그라운드 작업 처리 (service-worker.js)
 
 **주요 기능:**
-- 화면 캡처: `chrome.tabs.captureVisibleTab()` API 사용
-- Content Script와 메시지 통신: `chrome.runtime.onMessage` 리스너
-- 활성 탭 자동 감지 및 windowId 명시적 전달
+- Extension 설치/업데이트 시 로그 출력
+- 화면 캡처 기능 (DEV MODE에서만 활성화)
+  - `chrome.tabs.captureVisibleTab()` API 사용
+  - Content Script와 메시지 통신
+  - Netflix DRM으로 인해 대부분 환경에서 차단됨
 
 **메시지 타입:**
-- `CAPTURE_SCREEN`: 현재 탭의 화면 캡처 요청
+- `CAPTURE_SCREEN`: 현재 탭의 화면 캡처 요청 (DEV MODE 전용)
   - 응답 (성공): `{ dataUrl: "data:image/png;base64,..." }`
   - 응답 (실패): `{ error: "에러 메시지" }`
 
-**화면 캡처 플로우:**
-1. Content Script에서 `CAPTURE_SCREEN` 메시지 전송
-2. Service Worker가 활성 탭 ID 확인 (`sender.tab` 또는 `chrome.tabs.query` 사용)
-3. 탭 정보 조회하여 windowId 획득
-4. `chrome.tabs.captureVisibleTab(windowId, options)` 호출
-5. 캡처 성공 시 base64 데이터 URL 반환, 실패 시 에러 메시지 반환
-
-**에러 처리:**
-- 권한 부족: Extension 재로드 필요 메시지
-- Netflix DRM 보호: 파일 선택 방식 사용 안내
-- 보안 정책 차단: 대안 제시
+**참고:**
+- manifest.json의 `content_scripts`가 자동으로 Netflix 전체 페이지에 로드됨
+- Boot 패턴으로 watch 페이지 이동 시 자동 초기화
+- 수동 탭 주입 로직 불필요
 
 ### UIComponents
 UI 컴포넌트 생성 및 관리
@@ -336,22 +333,50 @@ FormData {
 
 ## 개발 가이드라인
 
-### 초기화 플로우 (content.js)
+### 초기화 플로우 (content.js) - Boot 패턴
 
-1. 비디오 플레이어 로드 대기
-2. 영상 메타데이터 감지
-3. 자막 캐시 매니저 초기화 (SubtitleCacheManager 생성)
-4. 백엔드에 영상 등록
-5. 플로팅 버튼 생성
-6. 이벤트 리스너 설정
-   - 플로팅 버튼 클릭 → 액션 패널 표시
-   - 단축키 (Ctrl+E / ⌘+E) → 액션 패널 표시
-   - 액션 패널 내 화면 캡처 → Background Script 통신
-   - 액션 패널 내 파일 선택 → 이미지 로드
-   - 설명 요청 → 이미지 업로드 (선택) → 자막 설명 API 호출
-   - 타임스탬프 이동
-   - 자막 변경 감지 (자막 캐시 업데이트용)
-7. 영상 변경 감지 시 캐시 초기화
+**1. 전역 초기화 (initGlobal - 한 번만 실행)**
+- i18n 초기화
+- 인스턴스 생성 (NetflixDetector, APIClient, UIComponents, SubtitleCacheManager)
+- CSS 애니메이션 주입
+- 단축키 등록 (Ctrl+E / ⌘+E) - 전역 이벤트 리스너
+
+**2. Boot 함수 (watch 페이지 감지 시 실행)**
+```javascript
+async function boot() {
+  // watch 페이지가 아니면 종료
+  if (!location.pathname.startsWith('/watch/')) {
+    // 플로팅 버튼 제거
+    return;
+  }
+
+  // 같은 videoId면 재초기화 스킵 (중복 방지)
+  const currentVideoId = location.pathname.match(/\/watch\/(\d+)/)?.[1];
+  if (isVideoPageInitialized && detector?.currentVideoId === currentVideoId) {
+    return;
+  }
+
+  // 전역 초기화 (한 번만)
+  await initGlobal();
+
+  // 영상 페이지 초기화
+  await initVideoPage();
+}
+```
+
+**3. 영상 페이지 초기화 (initVideoPage)**
+- 이전 플로팅 버튼 제거 (있는 경우)
+- 비디오 요소 대기 (선택적, 2초만)
+- 영상 메타데이터 추출 (JSON-LD, meta 태그, video 요소 등)
+- 자막 캐시 초기화 (새로운 videoId)
+- 자막 변경 감지 시작 (SubtitleObserver)
+- 백엔드에 영상 등록
+- 플로팅 버튼 생성 및 클릭 이벤트 등록
+
+**4. SPA 네비게이션 감지**
+- History API 패치 (pushState, replaceState)
+- popstate 이벤트 (뒤로가기/앞으로가기)
+- 주기적 체크 (500ms) - URL 변경 시 boot() 재호출
 
 ### 넷플릭스 DOM 선택자
 
@@ -410,6 +435,25 @@ CORS 문제 시 `manifest.json`에 host_permissions 추가
 - 모든 파일 경로 확인
 - Chrome 콘솔에서 에러 메시지 확인
 
+### Netflix watch 페이지에서 동작 안 함
+**증상**: Netflix 홈에서 영상 클릭 시 플로팅 버튼이 표시되지 않음
+
+**원인 및 해결**:
+1. **SPA 라우팅**: Netflix는 SPA이므로 페이지 이동 시 새로고침 없이 URL만 변경됨
+2. **해결**: Boot 패턴 + SPA 네비게이션 감지로 자동 해결
+   - manifest.json의 `matches`가 `https://www.netflix.com/*`로 설정되어 있어야 함
+   - History API 패치 + 주기적 체크 (500ms)로 URL 변경 감지
+3. **확인 방법**:
+   - 콘솔에서 "🔄 URL 변경 감지" 로그 확인
+   - "🎬 영상 초기화 진행: {videoId}" 로그 확인
+
+**테스트 케이스**:
+- ✅ Netflix 홈 → watch 페이지 이동: 자동 초기화
+- ✅ watch/123 → watch/456 이동: 재초기화
+- ✅ 같은 영상 내에서 머물기: 재초기화 스킵
+- ✅ 브라우저 뒤로가기: 정상 동작
+- ✅ URL 직접 입력: 정상 동작
+
 ### 화면 캡처 실패
 화면 캡처 버튼 클릭 시 에러가 발생하는 경우
 
@@ -451,13 +495,19 @@ CORS 문제 시 `manifest.json`에 host_permissions 추가
 ## 사용자 플로우
 
 ```
-[넷플릭스 접속 + 영상 재생]
+[넷플릭스 홈 페이지 접속]
     ↓
-[Extension: 💡 버튼 표시]
+[Extension: content script 로드 (전역 초기화)]
     ↓
-[백그라운드 분석 진행]
+[사용자가 영상 클릭 → /watch/ 페이지 이동]
     ↓
-[분석 완료 (에러 발생해도 메시지 표시 안 함)]
+[SPA 네비게이션 감지 → boot() 호출]
+    ↓
+[영상 메타데이터 추출 (2초 이내)]
+    ↓
+[백엔드 영상 등록 + 💡 플로팅 버튼 표시]
+    ↓
+[백그라운드 분석 진행 (에러 발생해도 메시지 표시 안 함)]
     ↓
 ━━━━━━━━━━━━━━━━━━━━━━━━
     ↓
@@ -481,6 +531,14 @@ CORS 문제 시 `manifest.json`에 host_permissions 추가
     ↓
 [2-3초 후 설명 표시]
     └─ 이미지 분석 결과 포함 (멀티모달 응답)
+    ↓
+━━━━━━━━━━━━━━━━━━━━━━━━
+    ↓
+[다음 에피소드 클릭 → /watch/456 이동]
+    ↓
+[SPA 네비게이션 감지 → boot() 재호출]
+    ↓
+[videoId 변경 감지 → 재초기화 진행]
 ```
 
 ## 개발 환경
@@ -498,13 +556,12 @@ CORS 문제 시 `manifest.json`에 host_permissions 추가
   "permissions": [
     "activeTab",
     "storage",
-    "tabs",
     "scripting"
   ],
   "host_permissions": [
-    "https://www.netflix.com/*",
-    "http://localhost:7777/*",
-    "<all_urls>"
+    "https://www.netflix.com/watch/*",
+    "http://localhost:8001/*",
+    "https://docentai-api-1064006289042.asia-northeast3.run.app/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
@@ -512,34 +569,34 @@ CORS 문제 시 `manifest.json`에 host_permissions 추가
   "content_scripts": [{
     "matches": ["https://www.netflix.com/*"],
     "js": [
+      "lib/config.js",
       "lib/i18n.js",
       "lib/api-client.js",
       "content/netflix-detector.js",
+      "content/subtitle-cache.js",
       "content/ui-components.js",
       "content/content.js"
     ],
     "css": ["content/styles.css"],
     "run_at": "document_end"
   }],
-  "commands": {
-    "explain-current-subtitle": {
-      "suggested_key": {
-        "default": "Ctrl+E",
-        "mac": "Command+E"
-      }
-    }
-  }
+  "web_accessible_resources": [{
+    "resources": ["lang/*.json"],
+    "matches": ["https://www.netflix.com/*"]
+  }]
 }
 ```
 
 **필수 권한 설명:**
 - `activeTab`: 활성 탭 접근 권한
 - `storage`: 로컬 스토리지 사용 권한 (자막 캐시 등)
-- `tabs`: 탭 정보 조회 및 관리 권한
 - `scripting`: 스크립트 실행 권한
-- `<all_urls>`: **화면 캡처에 필수** - `captureVisibleTab` API 사용을 위해 필요
-  - Chrome Web Store 배포 시 리뷰 필요
-  - 설치 시 "모든 사이트의 데이터를 읽고 변경" 권한 요청 표시됨
+
+**핵심 설정:**
+- `matches`: `https://www.netflix.com/*` - Netflix 전체 페이지에서 content script 로드
+  - SPA 라우팅 지원: 홈 페이지에서도 로드되어 watch 페이지 이동 시 즉시 동작
+- `host_permissions`: `/watch/*` - Chrome Web Store 승인을 위해 최소 권한으로 설정
+- `run_at`: `document_end` - DOM 로드 후 실행
 
 ## 참고 문서
 

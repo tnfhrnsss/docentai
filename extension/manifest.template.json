@@ -13,7 +13,6 @@
 
   "host_permissions": [
     "https://www.netflix.com/watch/*",
-    "http://localhost:8001/*",
     "https://docentai-api-1064006289042.asia-northeast3.run.app/*"
     {{CAPTURE_HOST_PERMISSIONS}}
   ],
@@ -24,7 +23,7 @@
 
   "content_scripts": [
     {
-      "matches": ["https://www.netflix.com/watch/*"],
+      "matches": ["https://www.netflix.com/*"],
       "js": [
         "lib/config.js",
         "lib/i18n.js",
