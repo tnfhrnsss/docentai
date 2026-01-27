@@ -369,8 +369,6 @@ class UIComponents {
           </div>
 
           <div>
-            <!-- 캡처 버튼은 동적으로 추가됩니다 (capture-feature.js 로드 시) -->
-
             <div id="image-preview-container" style="
               display: none;
               margin-top: 12px;
@@ -550,11 +548,6 @@ class UIComponents {
     previewImg.src = dataUrl;
     previewContainer.style.display = 'block';
   }
-
-  /**
-   * 화면 캡처 메서드는 capture-feature.js에서 동적으로 추가됩니다.
-   * 프로덕션 빌드에서는 capture-feature.js가 제외되므로 이 기능이 비활성화됩니다.
-   */
 
   /**
    * 소스 아이콘 가져오기

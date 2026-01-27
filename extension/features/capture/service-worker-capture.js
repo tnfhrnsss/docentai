@@ -1,12 +1,7 @@
 /**
- * 화면 캡처 기능 - Background Service Worker Extension
- *
- * 이 파일은 개발(dev) 빌드에서만 포함됩니다.
- * 프로덕션 빌드에서는 제외되어 Chrome Web Store 정책을 준수합니다.
+ * Background Service Worker Extension
  */
-/**
- * 화면 캡처 메시지 리스너
- */
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'CAPTURE_SCREEN') {
     // sender.tab에서 windowId 가져오기
