@@ -17,8 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     `<kbd>${shortcut}</kbd>`
   );
 
-  console.log('💡 DocentAI Popup 로드됨');
-
   // 설정 버튼
   const openOptionsBtn = document.getElementById('openOptionsBtn');
   openOptionsBtn.addEventListener('click', () => {

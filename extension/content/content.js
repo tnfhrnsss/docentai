@@ -14,8 +14,6 @@ async function initGlobal() {
   }
 
   try {
-    console.log('🚀 DocentAI 전역 초기화 중...');
-
     isGlobalInitialized = true;
 
     // i18n 초기화
@@ -33,10 +31,7 @@ async function initGlobal() {
 
     // 단축키 등록 (전역)
     setupEventListeners();
-
-    console.log('✅ 전역 초기화 완료');
   } catch (error) {
-    console.error('❌ DocentAI 전역 초기화 실패:', error);
     isGlobalInitialized = false; // 실패 시 재시도 가능하도록
   }
 }
@@ -50,14 +45,12 @@ function waitForVideoPlayer(maxWait = 2000) {
   return new Promise((resolve) => {
     const video = document.querySelector('video');
     if (video) {
-      console.log('🎬 비디오 요소 발견 (즉시)');
       resolve(true);
       return;
     }
 
     // 2초만 대기 (찾지 못해도 진행)
     const timeout = setTimeout(() => {
-      console.log('🎬 비디오 요소 없이 진행 (JSON-LD/meta 태그 사용)');
       resolve(false);
     }, maxWait);
 
@@ -67,7 +60,6 @@ function waitForVideoPlayer(maxWait = 2000) {
       if (video) {
         clearInterval(checkInterval);
         clearTimeout(timeout);
-        console.log('🎬 비디오 요소 발견');
         resolve(true);
       }
     }, 1000);
@@ -79,8 +71,6 @@ function waitForVideoPlayer(maxWait = 2000) {
  */
 async function registerVideo(metadata) {
   try {
-    console.log('📤 영상 등록 중...');
-
     const response = await apiClient.registerVideo(metadata);
 
     if (response.status === 'processing') {
@@ -90,7 +80,6 @@ async function registerVideo(metadata) {
     }
 
   } catch (error) {
-    console.error('영상 등록 실패:', error);
     // 에러 발생해도 사용자에게는 메시지 표시하지 않음 (스펙에 따라)
   }
 }
@@ -103,7 +92,6 @@ let isKeyboardListenerSetup = false;
  * 플로팅 버튼 클릭 이벤트는 버튼 생성 시 직접 등록됨
  */
 function setupEventListeners() {
-  console.log('🎧 이벤트 리스너 설정 중...');
 
   // 단축키 (Ctrl+E / ⌘+E) - 한 번만 등록
   if (!isKeyboardListenerSetup) {
@@ -120,18 +108,13 @@ function setupEventListeners() {
       }
     });
     isKeyboardListenerSetup = true;
-    console.log('✅ 단축키 등록 완료 (Ctrl+E / ⌘+E)');
   }
-
-  console.log('✅ 이벤트 리스너 설정 완료');
 }
 
 /**
  * Background script로부터 메시지 수신 (전체화면 단축키용)
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('📨 메시지 수신:', request.type);
-
   if (request.type === 'PING') {
     // Content script가 로드되었는지 확인하는 용도
     sendResponse({ pong: true });
@@ -154,8 +137,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function showActionPanel(text) {
-  console.log(`📋 액션 패널 표시: "${text}"`);
-
   ui.createActionPanel(text, async (imageData) => {
     // 설명 요청
     const centerX = window.innerWidth / 2;
@@ -168,8 +149,6 @@ function showActionPanel(text) {
  * 자막 설명 요청
  */
 async function explainSubtitle(text, x, y, imageData = null) {
-  console.log(`💡 설명 요청: "${text}"`, imageData ? '(이미지 포함)' : '');
-
   // 로딩 패널 표시
   const panel = ui.createExplanationPanel(text, x, y);
 
@@ -180,13 +159,10 @@ async function explainSubtitle(text, x, y, imageData = null) {
 
     // 1단계: 이미지가 있으면 먼저 업로드
     if (imageData) {
-      console.log('📤 이미지 업로드 중...');
       ui.updateExplanationPanelStatus('이미지 업로드 중...');
 
       const uploadResult = await apiClient.uploadImage(metadata.videoId, imageData);
       imageId = uploadResult.imageId;
-
-      console.log(`✅ 이미지 업로드 완료: ${imageId}`);
       ui.updateExplanationPanelStatus('분석 중...');
     }
 
@@ -205,15 +181,10 @@ async function explainSubtitle(text, x, y, imageData = null) {
       currentSubtitle: contextData.currentSubtitle // 현재 자막
     });
 
-    console.log(`⚡ 응답 시간: ${explanation.responseTime}ms`);
-    console.log(`📦 캐시: ${explanation.cached ? 'HIT' : 'MISS'}`);
-
     // 패널 업데이트
     ui.updateExplanationPanel(explanation);
 
   } catch (error) {
-    console.error('설명 생성 실패:', error);
-
     ui.updateExplanationPanel({
       error: true,
       message: error.message || i18n.t('ui.error'),
@@ -341,7 +312,6 @@ function observeSpaNavigation(callback) {
   function handleUrlChange() {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
-      console.log('🔄 URL 변경 감지:', lastUrl, '→', currentUrl);
       lastUrl = currentUrl;
       callback();
     }
@@ -377,24 +347,19 @@ function observeSpaNavigation(callback) {
  */
 async function initVideoPage() {
   try {
-    console.log('🎬 영상 페이지 초기화 시도...');
-
     // 이전 상태 정리
     if (ui.floatingButton) {
       ui.floatingButton.remove();
       ui.floatingButton = null;
-      console.log('🗑️ 이전 플로팅 버튼 제거');
     }
 
     // 비디오 요소 대기 (선택적 - 2초만)
     await waitForVideoPlayer(2000);
 
     // 영상 메타데이터 추출
-    console.log('📋 영상 메타데이터 추출 중...');
     const metadata = await detector.detectVideo();
 
     if (!metadata) {
-      console.log('❌ 영상 감지 실패');
       return;
     }
 
@@ -413,7 +378,6 @@ async function initVideoPage() {
     chrome.storage.sync.get({ showFloatingButton: true }, (settings) => {
       if (settings.showFloatingButton) {
         ui.createFloatingButton();
-        console.log('💡 플로팅 버튼 생성 (설정: ON)');
 
         // 플로팅 버튼 클릭 이벤트 등록
         if (ui.floatingButton) {
@@ -427,16 +391,11 @@ async function initVideoPage() {
             }
           });
         }
-      } else {
-        console.log('💡 플로팅 버튼 숨김 (설정: OFF)');
       }
-
-      console.log('✅ 영상 페이지 초기화 완료');
       isVideoPageInitialized = true;
     });
   } catch (error) {
-    console.error('❌ 영상 페이지 초기화 실패:', error);
-    console.error('❌ 에러 스택:', error.stack);
+    // ignore
   }
 }
 
@@ -444,18 +403,14 @@ async function initVideoPage() {
  * Boot 함수 - watch 페이지일 때만 초기화
  */
 async function boot() {
-  console.log('🥾 Boot 함수 호출됨:', location.pathname);
-
   // watch 페이지가 아니면 종료
   if (!location.pathname.startsWith('/watch/')) {
-    console.log('⏸️ watch 페이지 아님, 초기화 건너뜀');
 
     // watch 페이지를 벗어나면 플로팅 버튼 제거
     if (ui && ui.floatingButton) {
       ui.floatingButton.remove();
       ui.floatingButton = null;
       isVideoPageInitialized = false;
-      console.log('🗑️ 플로팅 버튼 제거');
     }
     return;
   }
@@ -463,11 +418,8 @@ async function boot() {
   // 같은 영상이면 재초기화 스킵 (중복 방지)
   const currentVideoId = location.pathname.match(/\/watch\/(\d+)/)?.[1];
   if (isVideoPageInitialized && detector?.currentVideoId === currentVideoId) {
-    console.log('✅ 같은 영상, 재초기화 스킵:', currentVideoId);
     return;
   }
-
-  console.log('🎬 영상 초기화 진행:', currentVideoId);
 
   // 전역 초기화 (한 번만)
   await initGlobal();
@@ -490,12 +442,10 @@ observeSpaNavigation(boot);
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.showFloatingButton) {
     const newValue = changes.showFloatingButton.newValue;
-    console.log('⚙️ showFloatingButton 설정 변경:', newValue);
 
     if (newValue && !ui.floatingButton && location.pathname.startsWith('/watch/')) {
       // 설정이 켜졌고 버튼이 없으며 watch 페이지인 경우 생성
       ui.createFloatingButton();
-      console.log('💡 플로팅 버튼 생성');
 
       // 버튼 생성 후 클릭 이벤트 등록
       if (ui.floatingButton) {
@@ -513,7 +463,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       // 설정이 꺼졌고 버튼이 있으면 제거
       ui.floatingButton.remove();
       ui.floatingButton = null;
-      console.log('💡 플로팅 버튼 제거');
     }
   }
 });

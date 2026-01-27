@@ -5,11 +5,9 @@
  * UIComponents 클래스에 captureScreen 메서드와 캡처 버튼을 추가합니다.
  */
 
-console.log('📸 화면 캡처 UI 기능이 활성화되었습니다 (DEV MODE)');
-
 // UIComponents 클래스가 이미 로드되었는지 확인
 if (typeof UIComponents === 'undefined') {
-  console.error('❌ UIComponents 클래스를 찾을 수 없습니다. capture-feature.js는 ui-components.js 이후에 로드되어야 합니다.');
+  // cannot find..
 } else {
   /**
    * 화면 캡처 기능 활성화 플래그
@@ -66,10 +64,6 @@ if (typeof UIComponents === 'undefined') {
 
         // 이미지 미리보기 컨테이너 앞에 삽입
         buttonContainer.insertBefore(captureBtn, imagePreviewContainer);
-
-        console.log('✅ 캡처 버튼이 추가되었습니다.');
-      } else {
-        console.error('❌ 이미지 미리보기 컨테이너를 찾을 수 없습니다.');
       }
     }
   };
@@ -85,12 +79,9 @@ if (typeof UIComponents === 'undefined') {
 
     // Extension context 유효성 체크
     if (!chrome.runtime || !chrome.runtime.id) {
-      console.error('❌ Extension context invalidated');
       this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
       return;
     }
-
-    console.log('📸 화면 캡처 준비: UI 요소 숨김');
 
     // 1. 액션 패널과 플로팅 버튼을 잠시 숨김 (캡처 이미지에 포함되지 않도록)
     const originalPanelDisplay = this.actionPanel.style.display;
@@ -103,7 +94,6 @@ if (typeof UIComponents === 'undefined') {
 
     // UI 복구 함수 (무조건 복구되도록 보장)
     const restoreUI = () => {
-      console.log('🔄 UI 복구 중...');
       if (this.actionPanel) {
         this.actionPanel.style.display = originalPanelDisplay;
       }
@@ -114,7 +104,6 @@ if (typeof UIComponents === 'undefined') {
 
     // 타임아웃 설정 (5초 후 무조건 UI 복구)
     const timeoutId = setTimeout(() => {
-      console.warn('⏱️ 화면 캡처 타임아웃 - UI 강제 복구');
       restoreUI();
       this.showToast('화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.');
     }, 5000);
@@ -134,8 +123,6 @@ if (typeof UIComponents === 'undefined') {
           restoreUI();
 
           if (chrome.runtime.lastError) {
-            console.error('❌ 메시지 전송 실패:', chrome.runtime.lastError);
-
             // Extension context invalidated 에러 특별 처리
             if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
               this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
@@ -146,24 +133,19 @@ if (typeof UIComponents === 'undefined') {
           }
 
           if (response && response.error) {
-            console.error('❌ 화면 캡처 실패:', response.error);
             this.showToast(`화면 캡처에 실패했습니다: ${response.error}`);
             return;
           }
 
           if (response && response.dataUrl) {
-            console.log('✅ 화면 캡처 성공');
             this.selectedImage = response.dataUrl;
             this.showImagePreview(response.dataUrl);
           } else {
-            console.error('❌ 응답 데이터 없음:', response);
             this.showToast('화면 캡처에 실패했습니다: 응답 데이터 없음');
           }
         }
       );
     } catch (error) {
-      console.error('❌ 화면 캡처 예외:', error);
-
       // 타임아웃 취소
       clearTimeout(timeoutId);
 
@@ -178,6 +160,4 @@ if (typeof UIComponents === 'undefined') {
       }
     }
   };
-
-  console.log('✅ UIComponents에 captureScreen 메서드 및 버튼이 추가되었습니다.');
 }

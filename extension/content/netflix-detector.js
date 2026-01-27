@@ -55,11 +55,10 @@ class NetflixDetector {
 
       if (fiberKey) {
         const fiber = rootElement[fiberKey];
-        console.log('✅ React Fiber 발견:', fiber);
         return this.deepFind(fiber, 'memoizedProps') || this.deepFind(fiber, 'pendingProps');
       }
     } catch (e) {
-      console.log('React Props 탐색 실패:', e.message);
+      // ignore
     }
     return null;
   }
@@ -70,8 +69,6 @@ class NetflixDetector {
   findNetflixPlayer() {
     if (this.netflixPlayer) return this.netflixPlayer;
 
-    console.log('🔍 Netflix 플레이어 객체 검색 중...');
-
     // 방법 1: window 객체에서 'netflix', 'player', 'cadmium', 'appContext' 키워드 검색
     const netflixKeys = Object.keys(window).filter(k => {
       const lk = k.toLowerCase();
@@ -81,8 +78,6 @@ class NetflixDetector {
              lk.includes('app') ||
              lk.includes('context');
     });
-
-    console.log('📦 발견된 Netflix 관련 키:', netflixKeys);
 
     // 방법 2: 알려진 패턴으로 플레이어 찾기
     const possiblePlayers = [
@@ -99,7 +94,6 @@ class NetflixDetector {
 
     for (const player of possiblePlayers) {
       if (player && typeof player === 'object') {
-        console.log('✅ 플레이어 객체 발견:', player);
         this.netflixPlayer = player;
         return player;
       }
@@ -110,7 +104,6 @@ class NetflixDetector {
       try {
         const obj = window[key];
         if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
-          console.log(`✅ 플레이어 객체 발견: window.${key}`, obj);
           this.netflixPlayer = obj;
           return obj;
         }
@@ -120,15 +113,11 @@ class NetflixDetector {
     }
 
     // 방법 4: React Fiber 탐색
-    console.log('🔍 React Fiber 탐색 중...');
     const reactProps = this.findReactProps();
     if (reactProps) {
       this.netflixPlayer = reactProps;
       return reactProps;
     }
-
-    console.log('⚠️ Netflix 플레이어 객체를 찾을 수 없습니다.');
-    console.log('💡 대안: DOM에서 직접 메타데이터를 추출합니다.');
     return null;
   }
 
@@ -143,54 +132,44 @@ class NetflixDetector {
       for (const script of scripts) {
         try {
           const data = JSON.parse(script.textContent);
-          console.log('📋 JSON-LD 데이터:', data);
-
           // 타이틀 정보
           if (data.name && !enhanced.episodeTitle) {
             enhanced.episodeTitle = data.name;
-            console.log('📺 제목 (JSON-LD name):', data.name);
           }
 
           // 장르
           if (data.genre) {
             enhanced.genre = Array.isArray(data.genre) ? data.genre.join(', ') : data.genre;
-            console.log('🎭 장르 (JSON-LD):', enhanced.genre);
           }
 
           // 시청 등급
           if (data.contentRating) {
             enhanced.maturityRating = data.contentRating;
-            console.log('🔞 시청 등급 (JSON-LD):', data.contentRating);
           }
 
           // 영상 길이
           if (data.duration) {
             enhanced.duration = data.duration;
-            console.log('⏱️ 영상 길이 (JSON-LD):', data.duration);
           }
 
           // 시즌 정보
           if (data.partOfSeason) {
             enhanced.seasonNumber = data.partOfSeason.seasonNumber;
-            console.log('📺 시즌 (JSON-LD):', data.partOfSeason.seasonNumber);
           }
 
           // 에피소드 번호
           if (data.episodeNumber) {
             enhanced.episodeNumber = data.episodeNumber;
-            console.log('📺 에피소드 (JSON-LD):', data.episodeNumber);
           }
 
           // 설명
           if (data.description && !enhanced.description) {
             enhanced.description = data.description;
-            console.log('📝 설명 (JSON-LD):', data.description);
           }
 
           // 출연진
           if (data.actor && Array.isArray(data.actor) && !enhanced.cast) {
             enhanced.cast = data.actor.map(a => a.name).join(', ');
-            console.log('🎭 출연진 (JSON-LD):', enhanced.cast);
           }
 
           // 감독
@@ -200,19 +179,16 @@ class NetflixDetector {
             } else if (data.director.name) {
               enhanced.director = data.director.name;
             }
-            console.log('🎬 감독 (JSON-LD):', enhanced.director);
           }
 
           // 년도
           if (data.datePublished && !enhanced.year) {
             enhanced.year = new Date(data.datePublished).getFullYear().toString();
-            console.log('📅 년도 (JSON-LD):', enhanced.year);
           }
 
           // 썸네일
           if (data.image && !enhanced.thumbnailUrl) {
             enhanced.thumbnailUrl = Array.isArray(data.image) ? data.image[0] : data.image;
-            console.log('🖼️ 썸네일 (JSON-LD):', enhanced.thumbnailUrl);
           }
 
         } catch (e) {
@@ -220,7 +196,7 @@ class NetflixDetector {
         }
       }
     } catch (e) {
-      console.log('JSON-LD 파싱 실패:', e.message);
+      // ignore
     }
 
     return enhanced;
@@ -248,7 +224,6 @@ class NetflixDetector {
       const element = document.querySelector(selector);
       if (element && element.textContent.trim()) {
         enhanced.episodeTitle = element.textContent.trim();
-        console.log('📺 에피소드 제목 (DOM):', enhanced.episodeTitle);
         break;
       }
     }
@@ -258,27 +233,23 @@ class NetflixDetector {
     if (metaTitle && metaTitle.content) {
       if (!enhanced.episodeTitle) {
         enhanced.episodeTitle = metaTitle.content;
-        console.log('📺 에피소드 제목 (og:title):', enhanced.episodeTitle);
       }
     }
 
     const metaDescription = document.querySelector('meta[property="og:description"]');
     if (metaDescription && metaDescription.content) {
       enhanced.description = metaDescription.content;
-      console.log('📝 설명 (og:description):', enhanced.description);
     }
 
     const metaImage = document.querySelector('meta[property="og:image"]');
     if (metaImage && metaImage.content) {
       enhanced.thumbnailUrl = metaImage.content;
-      console.log('🖼️ 썸네일 (og:image):', enhanced.thumbnailUrl);
     }
 
     // 3. 영상 길이 (비디오 요소에서)
     const video = document.querySelector('video');
     if (video && video.duration && video.duration !== Infinity) {
       enhanced.duration = Math.floor(video.duration);
-      console.log('⏱️ 영상 길이 (video 태그):', enhanced.duration);
     }
 
     // 4. 출연진/제작진 정보
@@ -292,7 +263,6 @@ class NetflixDetector {
       const element = document.querySelector(selector);
       if (element && element.textContent.trim()) {
         enhanced.cast = element.textContent.trim();
-        console.log('🎭 출연진 (DOM):', enhanced.cast);
         break;
       }
     }
@@ -301,7 +271,6 @@ class NetflixDetector {
     const yearElement = document.querySelector('.year, [data-uia="info-row-year"]');
     if (yearElement && yearElement.textContent.trim()) {
       enhanced.year = yearElement.textContent.trim();
-      console.log('📅 년도 (DOM):', enhanced.year);
     }
 
     return enhanced;
@@ -311,8 +280,6 @@ class NetflixDetector {
    * 향상된 메타데이터 추출 (Netflix 플레이어 객체 기반)
    */
   extractEnhancedMetadata() {
-    console.log('🔍 향상된 메타데이터 추출 시작...');
-
     let enhanced = {
       episodeTitle: null,
       genre: null,
@@ -331,8 +298,6 @@ class NetflixDetector {
     // 방법 3: Netflix 플레이어 객체에서 추출
     const player = this.findNetflixPlayer();
     if (player) {
-      console.log('🎮 플레이어 객체 탐색 중...');
-
       // 에피소드 제목 / 비디오 제목
       if (!enhanced.episodeTitle) {
         const episodeTitle = this.deepFind(player, 'episodeTitle') ||
@@ -343,7 +308,6 @@ class NetflixDetector {
                              this.deepFind(player, 'showTitle');
         if (episodeTitle && typeof episodeTitle === 'string') {
           enhanced.episodeTitle = episodeTitle;
-          console.log('📺 에피소드 제목 (플레이어):', episodeTitle);
         }
       }
 
@@ -354,7 +318,6 @@ class NetflixDetector {
                       this.deepFind(player, 'category');
         if (genre) {
           enhanced.genre = Array.isArray(genre) ? genre.join(', ') : genre;
-          console.log('🎭 장르 (플레이어):', enhanced.genre);
         }
       }
 
@@ -365,7 +328,6 @@ class NetflixDetector {
                                this.deepFind(player, 'maturityLevel');
         if (maturityRating) {
           enhanced.maturityRating = maturityRating;
-          console.log('🔞 시청 등급 (플레이어):', maturityRating);
         }
       }
 
@@ -375,7 +337,6 @@ class NetflixDetector {
                          this.deepFind(player, 'runtime');
         if (duration && typeof duration === 'number') {
           enhanced.duration = duration;
-          console.log('⏱️ 영상 길이 (플레이어):', duration);
         }
       }
 
@@ -386,7 +347,6 @@ class NetflixDetector {
                             this.deepFind(player, 'summary');
         if (description && typeof description === 'string') {
           enhanced.description = description;
-          console.log('📝 설명 (플레이어):', description);
         }
       }
 
@@ -400,7 +360,6 @@ class NetflixDetector {
           } else if (typeof cast === 'string') {
             enhanced.cast = cast;
           }
-          console.log('🎭 출연진 (플레이어):', enhanced.cast);
         }
       }
 
@@ -414,7 +373,6 @@ class NetflixDetector {
           } else if (typeof director === 'string') {
             enhanced.director = director;
           }
-          console.log('🎬 감독 (플레이어):', enhanced.director);
         }
       }
 
@@ -424,7 +382,6 @@ class NetflixDetector {
                      this.deepFind(player, 'releaseYear');
         if (year) {
           enhanced.year = year.toString();
-          console.log('📅 년도 (플레이어):', enhanced.year);
         }
       }
 
@@ -435,12 +392,9 @@ class NetflixDetector {
                           this.deepFind(player, 'poster');
         if (thumbnail && typeof thumbnail === 'string') {
           enhanced.thumbnailUrl = thumbnail;
-          console.log('🖼️ 썸네일 (플레이어):', enhanced.thumbnailUrl);
         }
       }
     }
-
-    console.log('✅ 최종 향상된 메타데이터:', enhanced);
     return enhanced;
   }
 
@@ -453,7 +407,6 @@ class NetflixDetector {
       const videoId = this.extractVideoIdFromURL();
 
       if (!videoId)  {
-        console.log('❌ videoId를 찾을 수 없습니다. URL:', window.location.href);
         return null;
       }
 
@@ -476,13 +429,9 @@ class NetflixDetector {
         duration: enhanced.duration,
         thumbnailUrl: enhanced.thumbnailUrl
       };
-
-      console.log('🎬 영상 감지 (전체 메타데이터):', this.metadata);
-
       return this.metadata;
 
     } catch (error) {
-      console.error('영상 감지 실패:', error);
       return null;
     }
   }
@@ -575,8 +524,6 @@ class NetflixDetector {
    * @param {Function} callback - 자막 변경 시 호출될 콜백 (text, timestamp)
    */
   startSubtitleObserver(callback) {
-    console.log('👀 자막 변경 감지 시작...');
-
     this.onSubtitleChangeCallback = callback;
 
     // 기존 옵저버가 있으면 정리
@@ -587,12 +534,9 @@ class NetflixDetector {
     // 자막 컨테이너 찾기
     const container = this.getSubtitleContainer();
     if (!container) {
-      console.log('⚠️ 자막 컨테이너를 찾을 수 없습니다. 3초 후 재시도...');
       setTimeout(() => this.startSubtitleObserver(callback), 3000);
       return;
     }
-
-    console.log('✅ 자막 컨테이너 발견:', container);
 
     // MutationObserver 생성
     this.subtitleObserver = new MutationObserver((mutations) => {
@@ -601,7 +545,6 @@ class NetflixDetector {
 
       // 자막이 변경되었고, 이전 자막과 다른 경우에만 콜백 호출
       if (currentSubtitle && currentSubtitle !== this.lastSubtitle) {
-        console.log(`🔄 자막 변경 감지: "${currentSubtitle}" (${currentTime.toFixed(1)}s)`);
         this.lastSubtitle = currentSubtitle;
 
         // 콜백 호출
@@ -617,8 +560,6 @@ class NetflixDetector {
       subtree: true,
       characterData: true
     });
-
-    console.log('✅ 자막 변경 감지 시작됨');
   }
 
   /**
@@ -628,7 +569,6 @@ class NetflixDetector {
     if (this.subtitleObserver) {
       this.subtitleObserver.disconnect();
       this.subtitleObserver = null;
-      console.log('🛑 자막 변경 감지 중지');
     }
   }
 }

@@ -50,7 +50,15 @@
     "newAnalysis": "🔍 신규 분석",
     "videoAnalyzing": "영상 분석 중",
     "pleaseWait": "잠시만 기다려주세요...",
-    "progress": "진행률"
+    "progress": "진행률",
+    "actionPanel": {
+      "title": "자막 설명 요청",
+      "currentSubtitle": "현재 자막",
+      "imagePreview": "이미지 미리보기",
+      "removeImage": "✕ 제거",
+      "cancel": "취소",
+      "explain": "💡 설명 요청"
+    }
   },
 
   "errors": {

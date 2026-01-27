@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "DocentAI - Subtitle Context Explainer",
   "version": "1.0.0",
-  "description": "넷플릭스 자막을 통해 AI가 맥락을 설명해줍니다",
+  "description": "AI explains the context through subtitles.",
 
   "permissions": [
     "activeTab",

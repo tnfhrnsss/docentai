@@ -20,8 +20,6 @@ class I18n {
 
     // 언어 파일 로드
     await this.loadLanguage(this.currentLang);
-
-    //console.log(`💡 DocentAI i18n initialized: ${this.currentLang}`);
   }
 
   /**
@@ -85,13 +83,11 @@ class I18n {
       if (message && typeof message === 'object') {
         message = message[k];
       } else {
-        console.warn(`Translation key not found: ${key}`);
         return key; // 키를 찾지 못하면 키 자체를 반환
       }
     }
 
     if (typeof message !== 'string') {
-      console.warn(`Translation value is not a string: ${key}`);
       return key;
     }
 
@@ -123,7 +119,6 @@ class I18n {
    */
   async setLanguage(lang) {
     if (!this.supportedLangs.includes(lang)) {
-      console.warn(`Unsupported language: ${lang}`);
       return;
     }
 

@@ -10,8 +10,6 @@ const DEFAULT_SETTINGS = {
 // 설정 로드
 function loadSettings() {
   chrome.storage.sync.get(DEFAULT_SETTINGS, (settings) => {
-    console.log('📥 설정 로드:', settings);
-
     document.getElementById('showFloatingButton').checked = settings.showFloatingButton;
   });
 }
@@ -23,8 +21,6 @@ function saveSettings() {
   };
 
   chrome.storage.sync.set(settings, () => {
-    console.log('💾 설정 저장:', settings);
-
     // 저장 메시지 표시
     const saveMessage = document.getElementById('saveMessage');
     saveMessage.classList.add('show');
@@ -39,7 +35,6 @@ function saveSettings() {
 function resetSettings() {
   if (confirm('모든 설정을 초기화하시겠습니까?')) {
     chrome.storage.sync.set(DEFAULT_SETTINGS, () => {
-      console.log('🔄 설정 초기화');
       loadSettings();
 
       const saveMessage = document.getElementById('saveMessage');
@@ -56,8 +51,6 @@ function resetSettings() {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('⚙️ DocentAI 설정 페이지 로드됨');
-
   loadSettings();
 
   // 저장 버튼

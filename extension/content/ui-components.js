@@ -326,7 +326,7 @@ class UIComponents {
             font-size: 18px;
             color: #ffd700;
             font-weight: 600;
-          ">자막 설명 요청</h3>
+          ">${i18n.t('ui.actionPanel.title')}</h3>
           <button class="close-btn" style="
             background: none;
             border: none;
@@ -358,7 +358,7 @@ class UIComponents {
               font-size: 12px;
               color: #ffd700;
               margin-bottom: 4px;
-            ">현재 자막</div>
+            ">${i18n.t('ui.actionPanel.currentSubtitle')}</div>
             <div style="
               font-size: 15px;
               color: #e0e0e0;
@@ -385,7 +385,7 @@ class UIComponents {
                 align-items: center;
                 margin-bottom: 8px;
               ">
-                <span style="font-size: 12px; color: #999;">이미지 미리보기</span>
+                <span style="font-size: 12px; color: #999;">${i18n.t('ui.actionPanel.imagePreview')}</span>
                 <button id="remove-image-btn" style="
                   background: none;
                   border: none;
@@ -395,7 +395,7 @@ class UIComponents {
                   padding: 4px 8px;
                   border-radius: 4px;
                   transition: background 0.2s;
-                ">✕ 제거</button>
+                ">${i18n.t('ui.actionPanel.removeImage')}</button>
               </div>
               <img id="image-preview" style="
                 width: 100%;
@@ -424,7 +424,7 @@ class UIComponents {
             font-size: 14px;
             font-weight: 500;
             transition: all 0.2s;
-          ">취소</button>
+          ">${i18n.t('ui.actionPanel.cancel')}</button>
           <button id="explain-btn" style="
             flex: 2;
             padding: 12px;
@@ -437,7 +437,7 @@ class UIComponents {
             font-weight: 600;
             transition: all 0.2s;
             box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-          ">💡 설명 요청</button>
+          ">${i18n.t('ui.actionPanel.explain')}</button>
         </div>
       </div>
     `;

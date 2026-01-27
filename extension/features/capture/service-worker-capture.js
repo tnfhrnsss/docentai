@@ -4,33 +4,23 @@
  * 이 파일은 개발(dev) 빌드에서만 포함됩니다.
  * 프로덕션 빌드에서는 제외되어 Chrome Web Store 정책을 준수합니다.
  */
-
-console.log('📸 화면 캡처 기능이 활성화되었습니다 (DEV MODE)');
-
 /**
  * 화면 캡처 메시지 리스너
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'CAPTURE_SCREEN') {
-    console.log('📩 메시지 수신: CAPTURE_SCREEN', 'Sender:', sender);
-
     // sender.tab에서 windowId 가져오기
     if (!sender.tab?.windowId) {
-      console.error('❌ 탭 정보를 찾을 수 없습니다.');
       sendResponse({ error: '활성 탭을 찾을 수 없습니다.' });
       return false;
     }
 
     const windowId = sender.tab.windowId;
-    console.log('🎯 캡처할 Window ID:', windowId);
-
     captureScreen(windowId)
       .then(dataUrl => {
-        console.log('✅ 화면 캡처 성공');
         sendResponse({ dataUrl });
       })
       .catch(error => {
-        console.error('❌ 화면 캡처 실패:', error);
         sendResponse({ error: error.message });
       });
 
@@ -44,17 +34,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  */
 async function captureScreen(windowId) {
   try {
-    console.log('🎯 화면 캡처 시도 중... Window ID:', windowId);
-
     // activeTab 권한으로 화면 캡처
     const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
       format: 'png'
     });
 
-    console.log('✅ 캡처 성공, 데이터 크기:', dataUrl?.length || 0);
     return dataUrl;
   } catch (error) {
-    console.error('❌ 화면 캡처 오류:', error);
 
     // 더 자세한 에러 메시지 제공
     let errorMessage = error.message;

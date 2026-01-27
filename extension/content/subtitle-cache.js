@@ -40,11 +40,6 @@ class SubtitleCacheManager {
     // 비언어적 표현 추출
     const nonVerbalCues = this.extractNonVerbalCues(text);
 
-    console.log(`📝 자막 캐시에 추가: "${text}" (${timestamp.toFixed(1)}s)`);
-    if (nonVerbalCues.length > 0) {
-      console.log(`🎵 비언어적 표현 감지: [${nonVerbalCues.join('], [')}]`);
-    }
-
     // 캐시에 추가
     this.cache.push({
       text: text.trim(),
@@ -55,13 +50,10 @@ class SubtitleCacheManager {
     // 최대 크기 초과 시 오래된 항목 제거 (FIFO)
     if (this.cache.length > this.maxCacheSize) {
       const removed = this.cache.shift();
-      console.log(`🗑️ 오래된 자막 제거: "${removed.text}"`);
     }
 
     // 마지막 자막 저장
     this.lastSubtitleText = text;
-
-    console.log(`📦 현재 캐시 크기: ${this.cache.length}/${this.maxCacheSize}`);
   }
 
   /**
@@ -81,8 +73,6 @@ class SubtitleCacheManager {
     const startIndex = Math.max(0, endIndex - count);
 
     const recent = this.cache.slice(startIndex, endIndex);
-    console.log(`📋 최근 ${count}개 자막 (총 ${recent.length}개):`, recent);
-
     return recent;
   }
 
@@ -117,8 +107,6 @@ class SubtitleCacheManager {
    * @param {string} videoId - 새로운 영상 ID
    */
   clear(videoId = null) {
-    console.log(`🧹 자막 캐시 초기화 (이전: ${this.currentVideoId}, 새로운: ${videoId})`);
-
     this.cache = [];
     this.lastSubtitleText = null;
     this.currentVideoId = videoId;
@@ -130,8 +118,6 @@ class SubtitleCacheManager {
    */
   setMaxCacheSize(size) {
     this.maxCacheSize = size;
-    console.log(`⚙️ 캐시 최대 크기 설정: ${size}`);
-
     // 현재 캐시가 새로운 크기를 초과하면 오래된 항목 제거
     while (this.cache.length > this.maxCacheSize) {
       this.cache.shift();

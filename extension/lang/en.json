@@ -53,7 +53,15 @@
     "newAnalysis": "🔍 New Analysis",
     "videoAnalyzing": "Analyzing Video",
     "pleaseWait": "Please wait...",
-    "progress": "Progress"
+    "progress": "Progress",
+    "actionPanel": {
+      "title": "Request Subtitle Explanation",
+      "currentSubtitle": "Current Subtitle",
+      "imagePreview": "Image Preview",
+      "removeImage": "✕ Remove",
+      "cancel": "Cancel",
+      "explain": "💡 Explain"
+    }
   },
 
   "errors": {
