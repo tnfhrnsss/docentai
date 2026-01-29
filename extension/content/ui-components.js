@@ -71,7 +71,7 @@ class UIComponents {
         left: ${safeX}px;
         top: ${safeY}px;
         width: 350px;
-        max-height: 500px;
+        max-height: 600px;
         background: rgba(20, 20, 20, 0.98);
         border: 1px solid rgba(255, 215, 0, 0.3);
         border-radius: 12px;
@@ -212,7 +212,7 @@ class UIComponents {
         margin-bottom: 16px;
         white-space: pre-line;
         word-wrap: break-word;
-        max-height: calc(1.7em * 4 + 8px);
+        max-height: calc(1.7em * 6 + 8px);
         overflow-y: auto;
         padding-right: 8px;
       ">${explanation.text.trim()}</div>
