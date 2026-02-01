@@ -1,0 +1,87 @@
+{
+  "appName": "DocentAI",
+  "appTagline": "Netflix Subtitle Explanation Assistant",
+
+  "popup": {
+    "howToUse": "How to Use",
+    "step1": "Play a video on Netflix",
+    "step2": "Click the 💡 button or press {shortcut}",
+    "step3": "AI will explain the context of the subtitle",
+    "shortcutWin": "Ctrl+E",
+    "shortcutMac": "⌘+E",
+    "statusLabel": "Status:",
+    "statusReady": "Ready",
+    "statusActive": "✅ Active",
+    "statusWaiting": "⏸️ Waiting (Works only on Netflix)",
+    "versionLabel": "Version:",
+    "settingsButton": "⚙️ Settings",
+    "footer": "For a better viewing experience",
+    "messageError": "Message sending failed:",
+    "fullscreenNoticeTitle": "⚠️ Fullscreen Mode",
+    "fullscreenNoticeDesc": "Fullscreen is not supported."
+  },
+
+  "options": {
+    "title": "DocentAI Settings",
+    "generalSettings": "General Settings",
+    "uiSettings": "UI Settings",
+    "advancedSettings": "Advanced Settings",
+
+    "enableExtension": "Enable Extension",
+    "enableExtensionDesc": "Turn DocentAI features on or off",
+
+    "showFloatingButton": "Show Floating Button",
+    "showFloatingButtonDesc": "Display the 💡 button in the top right",
+
+    "useDummyData": "Use Dummy Data (Dev Mode)",
+    "useDummyDataDesc": "Use dummy data instead of actual API",
+
+    "saveButton": "Save",
+    "resetButton": "Reset",
+    "saveMessage": "Settings saved successfully!"
+  },
+
+  "ui": {
+    "floatingButtonTitle": "Explain current subtitle (Shortcut: Ctrl+E)",
+    "analyzing": "Analyzing...",
+    "error": "An error occurred.",
+    "retryAfter": "Please try again after",
+    "noSubtitleAvailable": "No subtitle is currently displayed.",
+    "sourcesTitle": "📚 Sources",
+    "referencesTitle": "🔗 Related Scenes",
+    "cached": "⚡ Cached",
+    "newAnalysis": "🔍 New Analysis",
+    "videoAnalyzing": "Analyzing Video",
+    "pleaseWait": "Please wait...",
+    "progress": "Progress",
+    "actionPanel": {
+      "title": "Request Subtitle Explanation",
+      "currentSubtitle": "Current Subtitle",
+      "imagePreview": "Image Preview",
+      "removeImage": "✕ Remove",
+      "cancel": "Cancel",
+      "explain": "💡 Explain",
+      "captureScreen": "📸 Capture Screen"
+    },
+    "capture": {
+      "panelNotFound": "Action panel not found.",
+      "extensionUpdated": "Extension has been updated. Please refresh the page. (F5)",
+      "timeout": "Screen capture timed out. Please try again.",
+      "failed": "Screen capture failed",
+      "noResponse": "Screen capture failed: No response data",
+      "errors": {
+        "NO_ACTIVE_TAB": "Cannot find active tab.",
+        "PERMISSION_DENIED": "Permission denied: Please reload or reinstall the extension.",
+        "NO_TAB": "No active tab found.",
+        "DRM_BLOCKED": "Screen capture blocked by Netflix DRM protection. Please use 📁 File selection instead.",
+        "SECURE_PAGE": "Screen capture blocked by security policy. Please use 📁 File selection instead."
+      }
+    }
+  },
+
+  "errors": {
+    "networkError": "Cannot connect to the server. Please try again later.",
+    "retryLater": "A temporary error occurred. Please try again later.",
+    "profileIdNotFound": "Netflix profile information not found. Please make sure you are logged in to Netflix."
+  }
+}

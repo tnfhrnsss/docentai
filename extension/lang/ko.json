@@ -1,0 +1,84 @@
+{
+  "appName": "DocentAI",
+  "appTagline": "넷플릭스 자막 설명 도우미",
+
+  "popup": {
+    "howToUse": "사용 방법",
+    "step1": "넷플릭스에서 영상을 재생하세요",
+    "step2": "💡 버튼을 클릭하거나 {shortcut}를 누르세요",
+    "step3": "AI가 자막의 맥락을 설명해드립니다",
+    "shortcutWin": "Ctrl+E",
+    "shortcutMac": "⌘+E",
+    "statusLabel": "상태:",
+    "statusReady": "준비됨",
+    "statusActive": "✅ 활성화됨",
+    "statusWaiting": "⏸️ 대기 중 (넷플릭스에서만 작동)",
+    "versionLabel": "버전:",
+    "settingsButton": "⚙️ 설정",
+    "footer": "더 나은 시청 경험을 위해",
+    "messageError": "메시지 전송 실패:",
+    "fullscreenNoticeTitle": "⚠️ 전체화면 모드",
+    "fullscreenNoticeDesc": "전체화면에서는 지원하지 않습니다."
+  },
+
+  "options": {
+    "title": "DocentAI 설정",
+    "generalSettings": "일반 설정",
+    "uiSettings": "UI 설정",
+    "advancedSettings": "고급 설정",
+
+    "enableExtension": "확장 프로그램 활성화",
+    "enableExtensionDesc": "DocentAI 기능을 켜거나 끕니다",
+
+    "showFloatingButton": "플로팅 버튼 표시",
+    "showFloatingButtonDesc": "우측 상단에 💡 버튼을 표시합니다",
+
+    "saveButton": "저장",
+    "resetButton": "초기화",
+    "saveMessage": "설정이 저장되었습니다!"
+  },
+
+  "ui": {
+    "floatingButtonTitle": "현재 자막 설명 (단축키: Ctrl+E)",
+    "analyzing": "분석 중...",
+    "error": "오류가 발생했습니다.",
+    "retryAfter": "초 후 다시 시도해주세요.",
+    "noSubtitleAvailable": "현재 표시된 자막이 없습니다.",
+    "sourcesTitle": "📚 정보 출처",
+    "referencesTitle": "🔗 관련 장면",
+    "cached": "⚡ 캐시됨",
+    "newAnalysis": "🔍 신규 분석",
+    "videoAnalyzing": "영상 분석 중",
+    "pleaseWait": "잠시만 기다려주세요...",
+    "progress": "진행률",
+    "actionPanel": {
+      "title": "자막 설명 요청",
+      "currentSubtitle": "현재 자막",
+      "imagePreview": "이미지 미리보기",
+      "removeImage": "✕ 제거",
+      "cancel": "취소",
+      "explain": "💡 설명 요청",
+      "captureScreen": "📸 화면 캡처"
+    },
+    "capture": {
+      "panelNotFound": "액션 패널을 찾을 수 없습니다.",
+      "extensionUpdated": "확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)",
+      "timeout": "화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.",
+      "failed": "화면 캡처에 실패했습니다",
+      "noResponse": "화면 캡처에 실패했습니다: 응답 데이터 없음",
+      "errors": {
+        "NO_ACTIVE_TAB": "활성 탭을 찾을 수 없습니다.",
+        "PERMISSION_DENIED": "권한 부족: Extension을 다시 로드하거나 재설치해주세요.",
+        "NO_TAB": "활성화된 탭이 없습니다.",
+        "DRM_BLOCKED": "Netflix DRM 보호로 인해 화면 캡처가 차단되었습니다. 📁 파일 선택 기능을 이용해주세요.",
+        "SECURE_PAGE": "이 페이지는 보안 정책으로 화면 캡처가 차단됩니다. 📁 파일 선택 기능을 이용해주세요."
+      }
+    }
+  },
+
+  "errors": {
+    "networkError": "서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.",
+    "retryLater": "일시적인 오류입니다. 잠시 후 다시 시도해주세요.",
+    "profileIdNotFound": "Netflix 프로필 정보를 찾을 수 없습니다. Netflix에 로그인되어 있는지 확인해주세요."
+  }
+}

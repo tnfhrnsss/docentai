@@ -1,0 +1,74 @@
+/**
+ * DocentAI - Content Script Styles
+ * 넷플릭스 자막 설명 Chrome Extension
+ */
+
+/* 기본 리셋 - Extension 요소가 넷플릭스 스타일에 영향받지 않도록 */
+#subtitle-explainer-floating-btn,
+#subtitle-explanation-panel,
+#subtitle-hover-indicator,
+#video-analysis-progress {
+  all: initial;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* 플로팅 버튼 호버 효과 */
+#subtitle-explainer-floating-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 24px rgba(255, 215, 0, 0.6) !important;
+}
+
+/* 설명 패널 스크롤 */
+#subtitle-explanation-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.5) rgba(255, 255, 255, 0.05);
+}
+
+/* 설명 텍스트 영역 스크롤바 (WebKit) */
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar {
+  width: 6px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.5);
+  border-radius: 3px;
+}
+
+#subtitle-explanation-panel .explanation-content > div:first-child::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 215, 0, 0.7);
+}
+
+/* Firefox용 스크롤바 */
+#subtitle-explanation-panel .explanation-content > div:first-child {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.5) rgba(255, 255, 255, 0.05);
+}
+
+/* 링크 호버 효과 */
+#subtitle-explanation-panel a:hover {
+  text-decoration: underline !important;
+}
+
+/* 닫기 버튼 호버 */
+#subtitle-explanation-panel .close-btn:hover {
+  color: #fff !important;
+}
+
+/* 인디케이터 애니메이션 */
+#subtitle-hover-indicator {
+  animation: bounce 0.5s ease-in-out infinite !important;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}

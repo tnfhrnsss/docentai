@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "DocentAI - Subtitle Context Explainer",
+  "version": "1.0.0",
+  "description": "AI explains the context through subtitles.",
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+    {{CAPTURE_PERMISSIONS}}
+  ],
+
+  "host_permissions": [
+    "https://www.netflix.com/watch/*",
+    "https://docentai-api-1064006289042.asia-northeast3.run.app/*"
+    {{CAPTURE_HOST_PERMISSIONS}}
+  ],
+
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.netflix.com/*"],
+      "js": [
+        "lib/config.js",
+        "lib/i18n.js",
+        "lib/api-client.js"
+        {{CAPTURE_UTILS}},
+        "content/netflix-detector.js",
+        "content/subtitle-cache.js",
+        "content/ui-components.js"
+        {{CAPTURE_FEATURE}},
+        "content/content.js"
+      ],
+      "css": ["content/styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["lang/*.json"],
+      "matches": ["https://www.netflix.com/*"]
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/favicon-16x16.png",
+      "48": "assets/icons/favicon-48x48.png",
+      "128": "assets/icons/favicon-128x128.png"
+    }
+  },
+
+  "options_page": "options/options.html",
+
+  "icons": {
+    "16": "assets/icons/favicon-16x16.png",
+    "48": "assets/icons/favicon-48x48.png",
+    "128": "assets/icons/favicon-128x128.png"
+  }
+}

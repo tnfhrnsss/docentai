@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>DocentAI Icon Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #1a1a1a;
+      color: white;
+    }
+    .icon-container {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    canvas {
+      border: 1px solid #333;
+      background: white;
+    }
+    button {
+      padding: 10px 20px;
+      background: #ffd700;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    .instructions {
+      background: #2d2d2d;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💡 DocentAI 아이콘 생성기</h1>
+  <p>아래 버튼을 클릭하여 각 크기별 아이콘을 다운로드하세요.</p>
+
+  <div class="icon-container">
+    <div>
+      <h3>16x16</h3>
+      <canvas id="icon16" width="16" height="16"></canvas>
+      <br>
+      <button onclick="downloadIcon('icon16', 'icon16.png')">다운로드</button>
+    </div>
+    <div>
+      <h3>48x48</h3>
+      <canvas id="icon48" width="48" height="48"></canvas>
+      <br>
+      <button onclick="downloadIcon('icon48', 'icon48.png')">다운로드</button>
+    </div>
+    <div>
+      <h3>128x128</h3>
+      <canvas id="icon128" width="128" height="128"></canvas>
+      <br>
+      <button onclick="downloadIcon('icon128', 'icon128.png')">다운로드</button>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h3>사용 방법</h3>
+    <ol>
+      <li>각 아이콘의 "다운로드" 버튼을 클릭하여 PNG 파일을 저장합니다</li>
+      <li>다운로드한 파일을 <code>extension/assets/icons/</code> 폴더에 저장합니다</li>
+      <li>파일 이름이 <code>icon16.png</code>, <code>icon48.png</code>, <code>icon128.png</code>인지 확인합니다</li>
+    </ol>
+  </div>
+
+  <script>
+    // 아이콘 그리기 함수
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+
+      // 배경 - 그라데이션
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#ffd700');
+      gradient.addColorStop(1, '#ffed4e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      // 전구 이모지 (텍스트)
+      ctx.font = `${size * 0.7}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('💡', size / 2, size / 2);
+    }
+
+    // 아이콘 다운로드 함수
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // 페이지 로드 시 아이콘 생성
+    window.addEventListener('load', () => {
+      drawIcon('icon16', 16);
+      drawIcon('icon48', 48);
+      drawIcon('icon128', 128);
+    });
+  </script>
+</body>
+</html>
