@@ -24,9 +24,9 @@
             --text-primary: #ffffff;
             --text-secondary: #b3b3b3;
             --text-tertiary: #808080;
-            --accent-primary: #ffd700;
-            --accent-secondary: #ffed4e;
-            --accent-hover: #ffc700;
+            --accent-primary: #4285F4;
+            --accent-secondary: #5AB9EA;
+            --accent-hover: #1a73e8;
             --border-color: rgba(255, 255, 255, 0.1);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -169,8 +169,8 @@
         }
 
         .hero-image img {
-            width: 100%;
-            height: auto;
+            width: 80%;
+            height: 600px;
             display: block;
         }
 
@@ -552,12 +552,6 @@
         <h1>Understand Netflix Subtitles with AI</h1>
         <p class="subtitle">AI explains complex dialogues and narratives in context</p>
 
-        <div class="hero-image">
-            <!-- TODO: Add main screenshot - Full screen showing DocentAI explaining Netflix subtitles -->
-            <!-- Example: Netflix playback screen with explanation panel open -->
-            <img src="./assets/intro.png" alt="DocentAI Introduction" />
-        </div>
-
         <div style="background: rgba(255, 215, 0, 0.1); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 1.5rem; margin: 2rem auto; max-width: 800px;">
             <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">
                 <strong>🚧 Chrome Web Store Submission: Coming Soon</strong>
@@ -609,7 +603,7 @@
     <section id="solution">
         <div class="section-header">
             <h2>DocentAI Solves This</h2>
-            <p>Your AI docent understands the context and explains it clearly</p>
+            <p>Like a museum docent guiding you through art, DocentAI is your AI guide through Netflix narratives — understanding context and explaining clearly</p>
         </div>
 
         <div class="problem-grid">
@@ -641,41 +635,7 @@
         </div>
 
         <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-top: 2rem;">
-            <pre style="color: var(--text-secondary); overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
-┌─────────────────────────────────────────────────────────┐
-│                DocentAI - Complete System                │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────┐
-│  FRONTEND               │
-│  Chrome Extension       │
-│  (docentai)             │
-├─────────────────────────┤
-│ • Netflix Integration   │
-│ • Subtitle Detection    │
-│ • Context Tracking      │
-│ • User Interface        │
-│ • API Client            │
-└──────────┬──────────────┘
-           │
-           │ HTTPS/REST API
-           ↓
-┌─────────────────────────┐
-│  BACKEND                │
-│  AI Processing Server   │
-│  (docentai-core)        │
-├─────────────────────────┤
-│ • Gemini 3 Flash API    │ ⭐ AI Magic!
-│ • Search Grounding      │
-│ • Function Calling      │
-│ • 2-Step Architecture   │
-│ • SQLite Database       │
-└─────────────────────────┘
-           │
-           ↓
-    [Google Gemini AI]
-   (Search + Reasoning)
-            </pre>
+            <img src="assets/arch-overview.png" alt="DocentAI Architecture" />
         </div>
 
         <div class="problem-grid" style="margin-top: 2rem;">
@@ -764,14 +724,6 @@ cd docentai</code></pre>
                     </p>
                 </div>
             </div>
-
-            <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; background: rgba(66, 133, 244, 0.1); border-radius: 12px;">
-                <p style="color: var(--text-secondary); font-size: 1rem;">
-                    <strong>🏪 Chrome Web Store Release</strong><br>
-                    Public release planned after hackathon review period.<br>
-                    One-click installation will be available soon!
-                </p>
-            </div>
         </div>
     </section>
 
@@ -839,12 +791,6 @@ cd docentai</code></pre>
         </div>
 
         <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">💡</div>
-                <h3>Floating Button</h3>
-                <p>Always visible 💡 button in the top-right corner for instant explanations.</p>
-                <!-- TODO: Screenshot - Netflix screen showing floating button -->
-            </div>
 
             <div class="feature-card">
                 <div class="feature-icon">📸</div>
@@ -854,31 +800,10 @@ cd docentai</code></pre>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Smart Caching</h3>
-                <p>Previously analyzed subtitles are cached for instant display. Average response time: 25ms.</p>
-                <!-- TODO: Screenshot - Cached response display (⚡ Cached indicator) -->
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🔗</div>
-                <h3>Related Scene Links</h3>
-                <p>Provides timestamp links to related previous scenes for easy navigation.</p>
-                <!-- TODO: Screenshot - Explanation panel showing related scene links -->
-            </div>
-
-            <div class="feature-card">
                 <div class="feature-icon">🌐</div>
                 <h3>Multilingual Support</h3>
                 <p>Supports Korean and English, automatically switching based on browser language.</p>
                 <!-- TODO: Screenshot - English UI example -->
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⌨️</div>
-                <h3>Keyboard Shortcuts</h3>
-                <p>Press Ctrl+E (Windows) or ⌘+E (Mac) to quickly request explanations.</p>
-                <!-- TODO: Screenshot - Keyboard shortcut guide UI -->
             </div>
         </div>
     </section>
@@ -992,82 +917,6 @@ cd docentai</code></pre>
         </div>
     </section>
 
-    <!-- Gemini 3 Hackathon Section -->
-    <section id="hackathon" style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1)); border-radius: 16px; padding: 3rem 2rem;">
-        <div class="section-header">
-            <h2>🏆 Built for Gemini 3 Hackathon</h2>
-            <p>Leveraging Google's latest AI capabilities</p>
-        </div>
-
-        <div class="features-grid" style="margin-top: 2rem;">
-            <div class="feature-card">
-                <div class="feature-icon">🔍</div>
-                <h3>Search Grounding</h3>
-                <p><strong>Built-in web search</strong> powered by Gemini API - no separate Search API needed! Automatically gathers real-time knowledge about shows, characters, and plot details.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>2-Step Architecture</h3>
-                <p><strong>Cost-optimized design:</strong> Step 1 runs Search Grounding once per video and caches references. Step 2 uses cached data for fast, economical explanations.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>Function Calling</h3>
-                <p><strong>Intelligent tool use:</strong> Gemini decides when to search, query databases, or analyze timestamps. Multi-turn reasoning for complex narrative understanding.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🖼️</div>
-                <h3>Multimodal Analysis</h3>
-                <p><strong>Text + Image processing:</strong> Analyzes subtitles alongside screen captures to understand facial expressions, scene context, and visual cues.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🧠</div>
-                <h3>Large Context Window</h3>
-                <p><strong>Entire episode context:</strong> Processes full conversation history and episode metadata to provide contextually rich explanations.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Knowledge Graph</h3>
-                <p><strong>Structured understanding:</strong> Builds character relationship maps and timeline tracking for coherent narrative explanations.</p>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; border: 2px solid var(--accent-primary);">
-            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Why This Is NOT a Simple Prompt Wrapper</h3>
-            <div style="text-align: left; max-width: 800px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8;">
-                <p style="margin-bottom: 1rem;">❌ <strong>Simple wrapper:</strong> User clicks → Single Gemini call → Show response</p>
-
-                <p style="margin-bottom: 0.5rem;">✅ <strong>DocentAI:</strong> Multi-stage AI processing:</p>
-                <ul style="margin-left: 2rem; margin-bottom: 1rem;">
-                    <li><strong>Frontend:</strong> Gathers context (last 10 subtitles, metadata, optional image)</li>
-                    <li><strong>Backend:</strong> Multi-stage processing:
-                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                            <li>Knowledge graph lookup</li>
-                            <li><strong>Search Grounding</strong> for real-time web knowledge</li>
-                            <li><strong>Function Calling</strong> - Gemini decides which tools to use</li>
-                            <li>Multi-turn reasoning for complex narratives</li>
-                            <li>Timeline resolution and character relationship mapping</li>
-                        </ul>
-                    </li>
-                    <li><strong>Frontend:</strong> Renders rich explanation with clickable timeline references</li>
-                </ul>
-
-                <p><strong>Result:</strong> A production-ready, full-stack AI application that demonstrates advanced Gemini 3 capabilities.</p>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 2rem;">
-            <a href="https://github.com/tnfhrnsss/docentai-core" target="_blank" class="btn btn-primary">
-                🤖 View AI Backend Code
-            </a>
-        </div>
-    </section>
-
     <!-- CTA Section -->
     <section style="text-align: center; padding: 5rem 2rem; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1)); border-radius: 16px; margin: 2rem;">
         <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Try It Now</h2>
@@ -1115,13 +964,6 @@ cd docentai</code></pre>
                 <a href="#">API Reference</a>
                 <a href="#">Support</a>
                 <a href="#">Privacy Policy</a>
-            </div>
-
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <a href="mailto:contact@docentai.com">contact@docentai.com</a>
-                <a href="https://twitter.com/docentai" target="_blank">Twitter</a>
-                <a href="https://discord.gg/docentai" target="_blank">Discord</a>
             </div>
         </div>
 

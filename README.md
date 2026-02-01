@@ -3,7 +3,8 @@
 # 🎬 DocentAI - Chrome Extension
 
 **Your Personal Video Docent**  
-*Transform Netflix subtitles into interactive learning with AI*
+*Like a museum docent guiding you through art, \
+DocentAI is your AI guide through Netflix narratives — understanding context and explaining clearly*
 
 ![DocentAI Hero](extension/assets/icons/favicon-48x48.png)
 
