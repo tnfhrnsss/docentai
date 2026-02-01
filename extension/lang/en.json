@@ -60,7 +60,22 @@
       "imagePreview": "Image Preview",
       "removeImage": "✕ Remove",
       "cancel": "Cancel",
-      "explain": "💡 Explain"
+      "explain": "💡 Explain",
+      "captureScreen": "📸 Capture Screen"
+    },
+    "capture": {
+      "panelNotFound": "Action panel not found.",
+      "extensionUpdated": "Extension has been updated. Please refresh the page. (F5)",
+      "timeout": "Screen capture timed out. Please try again.",
+      "failed": "Screen capture failed",
+      "noResponse": "Screen capture failed: No response data",
+      "errors": {
+        "NO_ACTIVE_TAB": "Cannot find active tab.",
+        "PERMISSION_DENIED": "Permission denied: Please reload or reinstall the extension.",
+        "NO_TAB": "No active tab found.",
+        "DRM_BLOCKED": "Screen capture blocked by Netflix DRM protection. Please use 📁 File selection instead.",
+        "SECURE_PAGE": "Screen capture blocked by security policy. Please use 📁 File selection instead."
+      }
     }
   },
 

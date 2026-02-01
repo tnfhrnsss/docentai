@@ -57,7 +57,22 @@
       "imagePreview": "이미지 미리보기",
       "removeImage": "✕ 제거",
       "cancel": "취소",
-      "explain": "💡 설명 요청"
+      "explain": "💡 설명 요청",
+      "captureScreen": "📸 화면 캡처"
+    },
+    "capture": {
+      "panelNotFound": "액션 패널을 찾을 수 없습니다.",
+      "extensionUpdated": "확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)",
+      "timeout": "화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.",
+      "failed": "화면 캡처에 실패했습니다",
+      "noResponse": "화면 캡처에 실패했습니다: 응답 데이터 없음",
+      "errors": {
+        "NO_ACTIVE_TAB": "활성 탭을 찾을 수 없습니다.",
+        "PERMISSION_DENIED": "권한 부족: Extension을 다시 로드하거나 재설치해주세요.",
+        "NO_TAB": "활성화된 탭이 없습니다.",
+        "DRM_BLOCKED": "Netflix DRM 보호로 인해 화면 캡처가 차단되었습니다. 📁 파일 선택 기능을 이용해주세요.",
+        "SECURE_PAGE": "이 페이지는 보안 정책으로 화면 캡처가 차단됩니다. 📁 파일 선택 기능을 이용해주세요."
+      }
     }
   },
 

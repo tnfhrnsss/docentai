@@ -31,7 +31,7 @@ if (typeof UIComponents === 'undefined') {
 
         const captureBtn = document.createElement('button');
         captureBtn.id = 'capture-screen-btn';
-        captureBtn.innerHTML = '📸 화면 캡처';
+        captureBtn.innerHTML = i18n.t('ui.actionPanel.captureScreen');
         captureBtn.style.cssText = `
           width: 100%;
           padding: 10px;
@@ -73,13 +73,13 @@ if (typeof UIComponents === 'undefined') {
    */
   UIComponents.prototype.captureScreen = async function() {
     if (!this.actionPanel) {
-      this.showToast('액션 패널을 찾을 수 없습니다.');
+      this.showToast(i18n.t('ui.capture.panelNotFound'));
       return;
     }
 
     // Extension context 유효성 체크
     if (!chrome.runtime || !chrome.runtime.id) {
-      this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+      this.showToast(i18n.t('ui.capture.extensionUpdated'));
       return;
     }
 
@@ -105,7 +105,7 @@ if (typeof UIComponents === 'undefined') {
     // 타임아웃 설정 (5초 후 무조건 UI 복구)
     const timeoutId = setTimeout(() => {
       restoreUI();
-      this.showToast('화면 캡처 시간이 초과되었습니다. 다시 시도해주세요.');
+      this.showToast(i18n.t('ui.capture.timeout'));
     }, 5000);
 
     try {
@@ -125,15 +125,17 @@ if (typeof UIComponents === 'undefined') {
           if (chrome.runtime.lastError) {
             // Extension context invalidated 에러 특별 처리
             if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
-              this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+              this.showToast(i18n.t('ui.capture.extensionUpdated'));
             } else {
-              this.showToast(`화면 캡처에 실패했습니다: ${chrome.runtime.lastError.message}`);
+              this.showToast(`${i18n.t('ui.capture.failed')}: ${chrome.runtime.lastError.message}`);
             }
             return;
           }
 
-          if (response && response.error) {
-            this.showToast(`화면 캡처에 실패했습니다: ${response.error}`);
+          if (response && response.errorCode) {
+            // 에러 코드를 번역
+            const errorMessage = i18n.t(`ui.capture.errors.${response.errorCode}`);
+            this.showToast(errorMessage);
             return;
           }
 
@@ -141,7 +143,7 @@ if (typeof UIComponents === 'undefined') {
             this.selectedImage = response.dataUrl;
             this.showImagePreview(response.dataUrl);
           } else {
-            this.showToast('화면 캡처에 실패했습니다: 응답 데이터 없음');
+            this.showToast(i18n.t('ui.capture.noResponse'));
           }
         }
       );
@@ -154,9 +156,9 @@ if (typeof UIComponents === 'undefined') {
 
       // Extension context invalidated 에러 특별 처리
       if (error.message && error.message.includes('Extension context invalidated')) {
-        this.showToast('확장 프로그램이 업데이트되었습니다. 페이지를 새로고침해주세요. (F5)');
+        this.showToast(i18n.t('ui.capture.extensionUpdated'));
       } else {
-        this.showToast(`화면 캡처에 실패했습니다: ${error.message}`);
+        this.showToast(`${i18n.t('ui.capture.failed')}: ${error.message}`);
       }
     }
   };
