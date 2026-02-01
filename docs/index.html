@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DocentAI Demo</title>
+</head>
+<body>
+<h1>DocentAI - Interactive Demo</h1>
+
+<!-- 가짜 넷플릭스 플레이어 -->
+<div class="fake-netflix">
+    <video src="sample-video.mp4"></video>
+    <div class="subtitle" ondblclick="showExplanation()">
+        그때 그 사람이었어
+    </div>
+</div>
+
+<!-- 설명 패널 (미리 준비) -->
+<div id="explanation" style="display:none;">
+    <h3>AI 설명:</h3>
+    <p>이강인이 언급한 '그 사람'은...</p>
+</div>
+
+<script>
+    function showExplanation() {
+        // 실제 API 호출 대신 미리 준비한 응답
+        document.getElementById('explanation').style.display = 'block';
+    }
+</script>
+</body>
+</html>
