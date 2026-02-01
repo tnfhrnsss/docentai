@@ -1,265 +1,524 @@
-# DocentAI - Subtitle Context Explainer
+<div align="center">
 
-A Chrome Extension that uses AI to explain Netflix subtitles with contextual understanding.
+# 🎬 DocentAI - Chrome Extension
 
-## Overview
+**Your Personal Video Docent**  
+*Transform Netflix subtitles into interactive learning with AI*
 
-When you encounter difficult dialogues or scenes while watching movies or dramas — especially those in another language — DocentAI provides contextually-aware explanations.
+![DocentAI Hero](extension/assets/icons/favicon-48x48.png)
+
+[![Backend](https://img.shields.io/badge/Backend-docentai--core-blue?style=for-the-badge)](https://github.com/tnfhrnsss/docentai-core)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Coming_Soon-yellow?style=for-the-badge&logo=googlechrome)](https://github.com/tnfhrnsss/docentai#installation)
+[![Manual Install](https://img.shields.io/badge/Manual_Install-Available_Now-success?style=for-the-badge)](https://github.com/tnfhrnsss/docentai#-quick-start)
+
+🌐 **[Visit Landing Page →](https://tnfhrnsss.github.io/docentai)**
+
+> **🚧 Installation Status:** Currently available via manual installation for testing and hackathon review. Chrome Web Store release planned after hackathon review period.
+
+[🚀 Quick Start](#-quick-start) • [🔧 Installation](#-installation) • [🏗️ Architecture](#️-architecture) • [🏆 Hackathon](#-built-for-gemini-3-hackathon)
+
+</div>
+
+---
+
+## 🎯 What is DocentAI?
+
+DocentAI is a AI-Powered subtitle explanation tool that explains Netflix subtitles with contextual understanding.
+
+### vs Language Learning Tools
+
+DocentAI is NOT a language learning tool. It's a **narrative comprehension tool**.
+
+### DocentAI is for:
+- Native speakers confused by complex plots
+- Viewers who want deeper understanding
+- Educational analysis of narratives
+- Accessibility for comprehension difficulties
+
+### Repository
+1. **This Repository (Frontend)**: Chrome Extension for Netflix integration
+2. **[Backend Repository](https://github.com/tnfhrnsss/docentai-core)**: AI processing server powered by Gemini 3
 
 
+<table>
+<tr>
+<td width="50%">
 
-## Key Features
+### This Repository Contains:
+- Chrome Extension (Manifest V3)
+- Netflix UI integration
+- User interaction handling
+- Subtitle context tracking
+- API client
 
-- **Keyboard Shortcut**: Quick explanation request with `Ctrl+E` (Mac: `⌘+E`)
-- **Floating Button**: Explain current subtitle anytime with the 💡 button in the bottom right
-- **Enhanced Metadata**: Automatically extract episode title and video duration from Netflix player object
-- **Multimodal Analysis**: Video screen capture, extraction of non-verbal expressions (sounds, expressions)
+</td>
+<td width="50%">
+
+### Backend Handles:
+- 🤖 Gemini 3 Flash integration
+- Search Grounding & databases
+- AI reasoning & analysis
+- GCP Cloud Run deployment
+
+👉 **[See Backend Repo →](https://github.com/tnfhrnsss/docentai-core)**
+
+</td>
+</tr>
+</table>
+
+---
+
+## 💡 The Problem
+
+Have you ever watched a Korean drama and thought:
+
+> *"Wait, who's that person again?"*  
+> *"When did they meet before?"*  
+> *"What's happening? I'm so lost!"*
+
+**Complex narratives** with references to past episodes, intricate character relationships, and cultural context often leave viewers confused.
+
+The usual solution? **Pause → Google → Spoilers → Frustration** 😤
+
+<img alt="Problem Demo" height="110" src="docs/assets/demo-problem.png" width="210"/>
+
+---
+
+## ✨ Our Solution
+
+Just **press `Ctrl+E`** when you see confusing dialogue:
+
+<img alt="DocentAI Demo" height="400" src="docs/assets/demo-main.png" width="270"/>
+
+**What You Get:**
+- **Character Context** - Who's who and how they're connected
+- **Visual Analysis** - Optional screen capture for better context
+- **External Knowledge**
+
+<img alt="DocentAI Demo" height="200" src="docs/assets/demo-explanation.png" width="300"/>
+
+---
+
+## 🎬 Video Demo (to-do)
+
+Coming soon! For now, check out the screenshots below and try the manual installation.
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+**1. Backend Server** - Already live on GCP!
+- ✅ API Status: https://docentai-api-1064006289042.asia-northeast3.run.app/health
+- No backend setup needed for testing
+
+**2. Chrome Browser** (latest version recommended)
+
+### Installation (Manual - Dev Mode)
+
+```bash
+# 1. Clone this repository
+git clone https://github.com/tnfhrnsss/docentai
+cd docentai
+
+# 2. Build extension (Development mode includes all features)
+python build.py --mode dev
+
+# 3. Load in Chrome
+#    - Navigate to chrome://extensions/
+#    - Enable "Developer mode" (top right toggle)
+#    - Click "Load unpacked"
+#    - Select build/extension/ folder
+
+# 4. Visit Netflix and press Ctrl+E!
+```
+
+### Chrome Web Store Release
+
+🏪 **Coming Soon** - Public release planned after hackathon review period. One-click installation will be available!
+
+### Configuration
+
+If using local backend, update the API endpoint:
+
+```javascript
+// Edit: extension/lib/config.js
+
+const CONFIG = {
+  // Development (local backend)
+  API_BASE_URL: 'http://localhost:7777',
+  
+  // Production (GCP) - Default
+  // API_BASE_URL: 'https://docentai-api-1064006289042.asia-northeast3.run.app'
+};
+```
+
+<details>
+<summary>📦 Alternative: Install from ZIP</summary>
+
+1. Download `build/docentai-ui-dev-v1.0.0.zip` from releases
+2. Extract the ZIP file
+3. Load unpacked extension (same as step 3 above)
+
+</details>
+
+---
+
+## 🎯 How to Use
+
+### Two Ways to Explain Subtitles
+
+#### 1. Keyboard Shortcut (Fastest)
+```
+Press: Ctrl+E (Windows/Linux)
+       ⌘+E (Mac)
+```
+
+#### 2. 💡 Floating Button
+```
+Click the golden 💡 button in the bottom-right corner
+```
+
+### Action Panel Features
 
 
-## Build and Installation
+<img src="docs/assets/action-panel.png" alt="Interaction Methods" width="300"/>
 
-### 🛠️ Build Methods
+When the action panel appears:
 
-DocentAI supports two build modes.
+- **Request Explanation** - Get AI analysis with current context
+- **Capture Screen** - Add visual context (Dev mode only)
+- **Cancel** - Close panel
 
-#### 1. **Production Build** (For Chrome Web Store)
+---
+
+## System Architecture
+
+### Full DocentAI System
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                DocentAI - Complete System                │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────┐
+│  THIS REPOSITORY        │
+│  Chrome Extension       │
+│  (Frontend/UI)          │
+├─────────────────────────┤
+│ • Netflix Integration   │
+│ • Subtitle Detection    │
+│ • Context Tracking      │
+│ • User Interface        │
+│ • API Client            │
+└──────────┬──────────────┘
+           │
+           │ HTTPS/REST API
+           ↓
+┌─────────────────────────┐
+│  BACKEND REPOSITORY     │
+│  AI Processing Server   │
+│  (GCP Cloud Run)        │
+├─────────────────────────┤
+│ • Gemini 3 Flash API    │ ⭐ AI Magic!
+│ • Search Grounding      │
+│ • Function Calling      │
+│ • SQLite (Production)   │
+└─────────────────────────┘
+           │
+           ↓
+    [Gemini API] (Google AI)
+```
+
+**👉 [See Backend Architecture Details →](https://github.com/tnfhrnsss/docentai-core#architecture)**
+
+### Backend AI Capabilities
+
+The backend (docentai-core) provides powerful AI features powered by Google Gemini 3:
+
+**🔍 Search Grounding**
+- Built-in web search powered by Gemini API
+- No separate Search API needed
+- Automatic source attribution
+- Real-time knowledge gathering about shows, characters, and plots
+
+**⚡ 2-Step Architecture**
+- **Step 1:** Video registration → Search Grounding (once per video)
+- **Step 2:** Fast explanations using cached references
+- Cost-optimized design for production use
+
+👉 **[See Backend Details →](https://github.com/tnfhrnsss/docentai-core#key-features)**
+
+---
+
+### Frontend Architecture (This Repository)
+
+```
+Chrome Extension (Manifest V3)
+│
+├── Content Script (content.js)
+│   ├─ NetflixDetector
+│   │  └─ Extract video metadata, subtitles, timestamps
+│   │
+│   ├─ SubtitleCacheManager
+│   │  └─ Track last 10 subtitles for context
+│   │
+│   └─ UIComponents
+│      └─ Create action panel, explanation panel
+│
+├── Background Service Worker (service-worker.js)
+│   ├─ Screen capture (dev mode)
+│   ├─ Image upload handling
+│   └─ Cross-origin requests
+│
+└── Libraries (lib/)
+    ├─ APIClient - Backend communication
+    ├─ Config - Environment settings
+    └─ i18n - Multi-language support
+```
+
+---
+
+## API Integration
+
+This extension communicates with the backend via REST API.
+
+### API Endpoints Used
+
+| Endpoint | Purpose | Details |
+|----------|---------|---------|
+| `POST /api/video/register` | Register video for analysis | [Backend Docs](https://github.com/tnfhrnsss/docentai-core/blob/main/docs/API.md#register-video) |
+| `POST /api/image/upload` | Upload screenshot | [Backend Docs](https://github.com/tnfhrnsss/docentai-core/blob/main/docs/API.md#upload-image) |
+| `POST /api/explain` | Get AI explanation | [Backend Docs](https://github.com/tnfhrnsss/docentai-core/blob/main/docs/API.md#explain-subtitle) |
+| `GET /api/video/:id/status` | Check processing status | [Backend Docs](https://github.com/tnfhrnsss/docentai-core/blob/main/docs/API.md#video-status) |
+
+**Full API documentation:** [Backend API Docs](https://github.com/tnfhrnsss/docentai-core/blob/main/docs/API.md)
+
+---
+
+## 🛠️ Tech Stack (Frontend)
+
+```
+Extension Framework:
+├─ Manifest V3 (Latest Chrome Extension API)
+├─ Vanilla JavaScript (No frameworks - lightweight)
+└─ Chrome APIs (Storage, Runtime, Tabs)
+
+User Interface:
+├─ CSS3 (Animations, transitions)
+├─ Custom components (No UI library)
+└─ Responsive design
+
+Communication:
+├─ Fetch API (Backend requests)
+└─ Chrome Message Passing
+
+Build System:
+├─ Python build script (Multi-mode builds)
+└─ Environment-based configuration
+
+Internationalization:
+├─ Chrome i18n API
+└─ Supported: Korean, English
+```
+
+**Backend Tech Stack:** [See Backend README](https://github.com/tnfhrnsss/docentai-core#tech-stack)
+
+---
+
+## 📦 Build System
+
+DocentAI has **two build modes** to comply with Chrome Web Store policies while maintaining full functionality for demonstrations.
+
+### Development Build ⭐ (Recommended for Testing & Review)
+
+```bash
+python build.py --mode dev
+```
+
+**Includes:**
+- Screen capture feature (`features/capture/`)
+
+**Output:** `build/docentai-ui-dev-v1.0.0.zip`
+
+### Production Build (Future Chrome Web Store Release)
+
 ```bash
 python build.py --mode prod
 ```
-- Screen capture feature excluded
-- Complies with Chrome Web Store policies
-- Output: `build/docentai-ui-prod-v1.0.0.zip`
 
-#### 2. **Development Build** (For Hackathon/Manual Installation)
-```bash
-python build.py --mode dev
-```
-- 📸 Screen capture feature included
-- Additional features: `features/capture/` module
-- Output: `build/docentai-ui-dev-v1.0.0.zip`
+**Excludes:**
+- ❌ Screen capture (DRM policy compliance)
+- ❌ Debug logging
 
-### 📦 Manual Installation (For Hackathon Review)
-You can demonstrate all features using the development build for hackathon submissions.
+**Output:** `build/docentai-ui-prod-v1.0.0.zip`
 
-#### 1. Create Development Build
-```bash
-python build.py --mode dev
-```
-
-#### 2. Load Chrome Extension
-1. Navigate to `chrome://extensions/` in Chrome browser
-2. Enable **"Developer mode"** in the top right
-3. Click **"Load unpacked"**
-4. Select the `build/extension/` folder
-
-Or install directly from ZIP file:
-1. Extract `build/docentai-ui-dev-v1.0.0.zip`
-2. Load the extracted folder using the same method above
-
-
-### 🎬 Test on Netflix
-
-1. Visit https://www.netflix.com
-2. Play a video
-3. Click the 💡 button or press `Ctrl+E` shortcut
-4. In the action panel:
-   - **📸 Screen Capture**: Auto-capture current screen (DEV MODE only)
-   - **💡 Request Explanation**: Execute AI analysis
-
-
-## How to Use
-
-### Request Subtitle Explanation
-1. **Keyboard Shortcut**: Press `Ctrl+E` (Mac: `⌘+E`)
-2. **Floating Button**: Click the 💡 button in the top right corner
-
-### Settings
-
-Click the Extension icon to open the popup, then click the "⚙️ Settings" button:
-
-- Enable/disable the floating button (keyboard shortcut always available)
-
-## Tech Stack
-
-- **Manifest V3**: Latest Chrome Extension API
-- **Vanilla JavaScript**: Pure JavaScript without frameworks
-- **CSS**: Inline styles + separate CSS files
-- **Chrome Storage API**: Settings storage
-
-## Core Components
-
-### NetflixDetector
-
-Detects Netflix video metadata and extracts subtitles.
-
-**Key Methods:**
-- `detectVideo()`: Detect video playback and extract metadata
-- `extractVideoIdFromURL()`: Extract videoId from URL
-- `getCurrentSubtitle()`: Get currently displayed subtitle text
-- `getCurrentTime()`: Get current playback time
-- `onSubtitleChange(callback)`: Execute callback when subtitle changes
-
-```javascript
-const detector = new NetflixDetector();
-const metadata = await detector.detectVideo();
-const subtitle = detector.getCurrentSubtitle();
-```
-
-### SubtitleCacheManager
-
-Manages subtitle context caching for AI to understand dialogue flow.
-
-**Key Methods:**
-- `addSubtitle(text, timestamp)`: Add new subtitle to cache
-- `getRecentSubtitles(count)`: Get recent N subtitles
-- `clear()`: Clear cache
-- `getContextForAPI()`: Get context data for API calls (current + previous subtitles)
-
-```javascript
-const cacheManager = new SubtitleCacheManager();
-cacheManager.addSubtitle("Previous dialogue", 120.5);
-const context = cacheManager.getRecentSubtitles(10);
-```
-
-### UIComponents
-
-Creates and manages UI elements.
-
-**Key Methods:**
-- `createFloatingButton()`: Create 💡 floating button
-- `createActionPanel(selectedText, onExplain)`: Create action panel with image attachment UI
-- `createExplanationPanel(text, x, y)`: Create explanation panel
-- `updateExplanationPanel(explanation)`: Update panel content
-- `captureScreen()`: Capture screen via Background Script (DEV mode only)
-- `handleImageFile(file)`: Handle image file upload
-- `showImagePreview(dataUrl)`: Show image preview
-
-```javascript
-const ui = new UIComponents();
-ui.createFloatingButton();
-ui.createActionPanel("Current subtitle", async (imageId) => {
-  // Request explanation with optional imageId
-});
-```
-
-### APIClient
-
-Handles backend API communication.
-
-**Key Methods:**
-- `registerVideo(metadata)`: Register video for analysis
-- `uploadImage(imageData)`: Upload image for multimodal analysis
-- `explainSubtitle(data)`: Request subtitle explanation (with optional imageId)
-- `getVideoStatus(videoId)`: Check video processing status
-
-```javascript
-const apiClient = new APIClient('http://localhost:8001');
-const { imageId } = await apiClient.uploadImage(imageBlob);
-const explanation = await apiClient.explainSubtitle({
-  videoId, currentSubtitle, context, imageId
-});
-```
-
-## Screenshots
-
-<!-- TODO: Add screenshots here -->
-
-**Action Panel with Image Attachment:**
-<!-- Screenshot placeholder -->
-
-**Explanation Panel:**
-<!-- Screenshot placeholder -->
-
-**Settings Page:**
-<!-- Screenshot placeholder -->
-
-## Platform Support
-
-**Currently Supported:**
-- ✅ Netflix
-
-**Planned Support:**
-- 🔜 YouTube
-- 🔜 Disney+
-- 🔜 Wavve
-
-## Language Support
-
-DocentAI currently supports the following languages:
-- 🇰🇷 Korean (한국어)
-- 🇺🇸 English
-
-The extension automatically detects your browser language and displays UI accordingly.
-
-## Build Mode Comparison
-
-| Feature | Production Build (prod) | Development Build (dev) |
-|---------|------------------------|-------------------------|
-| Screen Capture | ❌ Disabled | ✅ Enabled |
-| Use Case | Chrome Web Store | Hackathon, Demo, Development |
-| Output | `build/docentai-ui-prod-v1.0.0.zip` | `build/docentai-ui-dev-v1.0.0.zip` |
+> **Note:** Chrome Web Store submission is planned. The production build will be used for public release.
 
 ### Why Two Build Modes?
 
-Chrome Web Store does not allow screen capture on DRM-protected content (Netflix). Therefore:
-
-- **Production Build (prod)**: Screen capture feature removed for official Chrome Web Store deployment
-- **Development Build (dev)**: All features included for hackathon demos and manual installation
-
-### Build Architecture
+Chrome Web Store doesn't allow extensions to capture screens on DRM-protected content (Netflix). Our modular architecture cleanly separates this feature:
 
 ```
 extension/
 ├── features/
-│   └── capture/              # 📸 Capture feature (DEV only)
-│       ├── capture-feature.js       # UI extension
-│       ├── service-worker-capture.js # Background extension
-│       └── imageIO-utils.js         # Image utilities
-├── manifest.template.json    # Template (generated during build)
+│   └── capture/              ← 📸 This folder
+│       ├── capture-feature.js        (Excluded in prod)
+│       ├── service-worker-capture.js (Excluded in prod)
+│       └── imageIO-utils.js          (Excluded in prod)
 └── ...
 ```
 
-Build Process:
-- `manifest.template.json` → `manifest.json` (flag substitution)
-- DEV mode: Includes `features/capture/`
-- PROD mode: Excludes `features/capture/`
+**Build Process:**
+1. `manifest.template.json` → `manifest.json` (flag substitution)
+2. **Dev mode**: Includes all files
+3. **Prod mode**: Excludes `features/capture/` folder
+
+---
+
+## 🔧 Development
+
+### Project Structure
+
+```
+docentai-ui/
+├── extension/
+│   ├── content/
+│   │   ├── content.js              # Main content script
+│   │   ├── netflix-detector.js     # Video detection
+│   │   ├── subtitle-cache.js       # Context tracking
+│   │   └── ui-components.js        # UI creation
+│   │
+│   ├── background/
+│   │   └── service-worker.js       # Background tasks
+│   │
+│   ├── lib/
+│   │   ├── api-client.js           # Backend API
+│   │   ├── config.js               # Configuration
+│   │   └── i18n-helper.js          # Localization
+│   │
+│   ├── features/
+│   │   └── capture/                # 📸 Screen capture (dev)
+│   │       ├── capture-feature.js
+│   │       ├── service-worker-capture.js
+│   │       └── imageIO-utils.js
+│   │
+│   ├── _locales/                   # i18n
+│   │   ├── ko/
+│   │   │   └── messages.json
+│   │   └── en/
+│   │       └── messages.json
+│   │
+│   ├── assets/                     # Icons, images
+│   ├── manifest.template.json      # Template
+│   └── styles.css                  # Styles
+│
+├── build/                          # Build output
+│   ├── extension/                  # Unpacked
+│   └── *.zip                       # Packaged
+│
+├── build.py                        # Build script
+├── .env.example                    # Environment template
+└── README.md                       # This file
+```
+
+### Local Development
+
+```bash
+# 1. Clone and install
+git clone https://github.com/tnfhrnsss/docentai
+cd docentai-ui
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env if needed
+
+# 3. Build
+python build.py --mode dev
+
+# 4. Load in Chrome
+# chrome://extensions/ → Load unpacked → build/extension/
+
+# 5. Make changes
+# Edit files in extension/
+
+# 6. Rebuild
+python build.py --mode dev
+
+# 7. Reload extension in Chrome
+# chrome://extensions/ → Click reload icon
+```
+
+### Testing
+
+```bash
+# Test on Netflix
+1. Visit https://www.netflix.com
+2. Play any video
+3. Press Ctrl+E
+4. Check console for logs (F12)
+
+# Test API integration
+# Make sure backend is running first
+curl http://localhost:7777/health
+```
+
+---
+
+## 🌍 Supported Languages
+
+### Languages
+
+- 🇰🇷 **Korean** - Full support
+- 🇺🇸 **English** - Full support
+
+The extension automatically detects your browser language and adapts the UI accordingly.
+
+---
 
 ## Known Issues
 
-### Netflix DRM Protection
-- Netflix uses DRM (Digital Rights Management) to block screen capture
-- Chrome Extension's `captureVisibleTab` API is blocked in most environments
-- **Workaround**: Use 📁 file selection feature to upload separately captured screenshots (Win+Shift+S on Windows, Cmd+Shift+4 on Mac)
+### Netflix DRM Protection ⚠️
 
-### Other Issues
-- Subtitle detection may fail if Netflix changes its DOM structure
-- Netflix player object may not be immediately available on page load
+**Issue:** Chrome's `captureVisibleTab` API is blocked by Netflix's DRM (Digital Rights Management)
 
-## Technical Notes
+**Impact:** Screen capture feature may not work in production environments
 
-### Boot Pattern for SPA Navigation
-DocentAI implements a boot pattern to handle Netflix's Single Page Application (SPA) routing:
+**Workarounds:**
+1. **Development Build**: Uses alternative capture methods (may still be blocked)
+2. **File Upload**: Use system screenshot tool (Win+Shift+S, Cmd+Shift+4) and upload via 📁 button
+3. **Text-only**: Skip image capture, use text context only
 
-- **Global Initialization** (`initGlobal`): Runs once - i18n, instance creation, keyboard shortcuts
-- **Video Page Initialization** (`initVideoPage`): Runs on each video page - metadata extraction, subtitle detection, floating button creation
-- **SPA Navigation Detection**: History API patching + periodic URL checks (500ms)
-- **Duplicate Prevention**: Skips re-initialization for the same videoId
+**Note:** This is why we have separate dev/prod builds. The dev build attempts capture for demonstration purposes.
 
-### API Endpoints
+---
 
-**Backend Base URL:** `http://localhost:7777` (configurable in `lib/config.js`)
+## 📄 License
 
-- `POST /api/video/register`: Register video metadata
-- `POST /api/image/upload`: Upload image for multimodal analysis
-- `POST /api/explain`: Request subtitle explanation
+MIT License - See [LICENSE](LICENSE) for details.
 
-## For Hackathon Reviewers
+---
 
-This project provides two build modes to comply with Chrome Web Store policies:
+## 🔗 Related Repositories
 
-1. **For Review**: Use `python build.py --mode dev` to demonstrate full functionality including screen capture
-2. **For Production**: Use `python build.py --mode prod` for Chrome Web Store submission
+| Repository | Description | Status |
+|------------|-------------|--------|
+| **[docentai](https://github.com/tnfhrnsss/docentai)** | Chrome Extension (You are here) | ✅ Active |
+| **[docentai-core](https://github.com/tnfhrnsss/docentai-core)** | AI Backend Server | ✅ Live on GCP |
 
-The screen capture feature is fully modularized and isolated in the `features/capture/` folder.
-This folder is completely excluded from production builds.
 
+---
+
+<div align="center">
+
+**This is the frontend component of DocentAI.**
+
+**For AI backend and Gemini 3 integration details:**
+**👉 [Visit docentai-core →](https://github.com/tnfhrnsss/docentai-core)**
+
+---
+
+[⬆ Back to Top](#-docentai---chrome-extension)
+
+</div>
