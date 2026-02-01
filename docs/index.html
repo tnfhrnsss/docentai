@@ -1,30 +1,1202 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>DocentAI Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DocentAI - AI-powered Netflix subtitle explainer. Understand complex dialogues with context-aware multimodal analysis for better viewing experience.">
+    <meta name="keywords" content="Netflix, AI, Subtitle, Explainer, Chrome Extension, DocentAI">
+    <meta property="og:title" content="DocentAI - Netflix Subtitle Explainer">
+    <meta property="og:description" content="AI explains Netflix subtitles with contextual understanding">
+    <meta property="og:image" content="./assets/intro.png">
+    <meta property="og:type" content="website">
+
+    <title>DocentAI - Understand Netflix Subtitles with AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-tertiary: #808080;
+            --accent-primary: #ffd700;
+            --accent-secondary: #ffed4e;
+            --accent-hover: #ffc700;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --netflix-red: #e50914;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e5e5e5;
+            --text-primary: #0a0a0a;
+            --text-secondary: #404040;
+            --text-tertiary: #666666;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        [data-theme="light"] header {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .hero-image {
+            margin: 3rem 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Section Styles */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Problem Section */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .problem-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-primary);
+        }
+
+        .problem-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-card p {
+            color: var(--text-secondary);
+        }
+
+        /* How It Works */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            position: relative;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #000;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+        }
+
+        /* Demo Section */
+        .demo-container {
+            margin-top: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .demo-container img,
+        .demo-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .demo-placeholder {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        .feature-screenshot {
+            margin-top: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Tech Stack */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .tech-badge {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* FAQ */
+        .faq-list {
+            max-width: 800px;
+            margin: 2rem auto 0;
+        }
+
+        .faq-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-primary);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--accent-primary);
+        }
+
+        .footer-section a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-tertiary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .steps,
+            .features-grid,
+            .problem-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
 </head>
 <body>
-<h1>DocentAI - Interactive Demo</h1>
+    <!-- Header -->
+    <header>
+        <nav>
+            <a href="#" class="logo">
+                💡 DocentAI
+            </a>
+            <div class="nav-links">
+                <a href="#installation">Installation</a>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://github.com/tnfhrnsss/docentai" target="_blank">GitHub</a>
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </nav>
+    </header>
 
-<!-- 가짜 넷플릭스 플레이어 -->
-<div class="fake-netflix">
-    <video src="sample-video.mp4"></video>
-    <div class="subtitle" ondblclick="showExplanation()">
-        그때 그 사람이었어
-    </div>
-</div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Understand Netflix Subtitles with AI</h1>
+        <p class="subtitle">AI explains complex dialogues and narratives in context</p>
 
-<!-- 설명 패널 (미리 준비) -->
-<div id="explanation" style="display:none;">
-    <h3>AI 설명:</h3>
-    <p>이강인이 언급한 '그 사람'은...</p>
-</div>
+        <div class="hero-image">
+            <!-- TODO: Add main screenshot - Full screen showing DocentAI explaining Netflix subtitles -->
+            <!-- Example: Netflix playback screen with explanation panel open -->
+            <img src="./assets/intro.png" alt="DocentAI Introduction" />
+        </div>
 
-<script>
-    function showExplanation() {
-        // 실제 API 호출 대신 미리 준비한 응답
-        document.getElementById('explanation').style.display = 'block';
-    }
-</script>
+        <div style="background: rgba(255, 215, 0, 0.1); border: 2px solid var(--accent-primary); border-radius: 12px; padding: 1.5rem; margin: 2rem auto; max-width: 800px;">
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">
+                <strong>🚧 Chrome Web Store Submission: Coming Soon</strong>
+            </p>
+            <p style="font-size: 0.95rem; color: var(--text-secondary);">
+                Currently available via manual installation for testing and hackathon review.
+            </p>
+        </div>
+
+        <div class="cta-buttons">
+            <a href="#installation" class="btn btn-primary">
+                📦 Manual Installation Guide
+            </a>
+            <a href="#demo" class="btn btn-secondary">
+                🎬 Watch Demo
+            </a>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem">
+        <div class="section-header">
+            <h2>Ever had this experience?</h2>
+            <p>Lost in translation while watching Netflix...</p>
+        </div>
+
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="icon">🤔</div>
+                <h3>Complex Dialogues</h3>
+                <p>"Who is that person?" "What does this line mean?" Ever felt confused while watching a drama?</p>
+            </div>
+
+            <div class="problem-card">
+                <div class="icon">⏸️</div>
+                <h3>Breaking Immersion</h3>
+                <p>Pausing to Google search breaks the flow and ruins the viewing experience.</p>
+            </div>
+
+            <div class="problem-card">
+                <div class="icon">📚</div>
+                <h3>Missing Context</h3>
+                <p>Can't remember previous episodes, making current dialogues hard to understand.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution">
+        <div class="section-header">
+            <h2>DocentAI Solves This</h2>
+            <p>Your AI docent understands the context and explains it clearly</p>
+        </div>
+
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="icon">🎯</div>
+                <h3>Context-Aware Explanations</h3>
+                <p>Analyzes the entire video flow to explain current subtitles in context.</p>
+            </div>
+
+            <div class="problem-card">
+                <div class="icon">⚡</div>
+                <h3>Real-Time Analysis</h3>
+                <p>Click on subtitles for instant AI analysis. Response time: 25ms (cached) to 2.3s (new queries).</p>
+            </div>
+
+            <div class="problem-card">
+                <div class="icon">🖼️</div>
+                <h3>Multimodal Support</h3>
+                <p>Include screen capture for scene analysis and more accurate explanations.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Architecture -->
+    <section id="architecture">
+        <div class="section-header">
+            <h2>System Architecture</h2>
+            <p>Two-repository architecture for optimal performance</p>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-top: 2rem;">
+            <pre style="color: var(--text-secondary); overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6;">
+┌─────────────────────────────────────────────────────────┐
+│                DocentAI - Complete System                │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────┐
+│  FRONTEND               │
+│  Chrome Extension       │
+│  (docentai)             │
+├─────────────────────────┤
+│ • Netflix Integration   │
+│ • Subtitle Detection    │
+│ • Context Tracking      │
+│ • User Interface        │
+│ • API Client            │
+└──────────┬──────────────┘
+           │
+           │ HTTPS/REST API
+           ↓
+┌─────────────────────────┐
+│  BACKEND                │
+│  AI Processing Server   │
+│  (docentai-core)        │
+├─────────────────────────┤
+│ • Gemini 3 Flash API    │ ⭐ AI Magic!
+│ • Search Grounding      │
+│ • Function Calling      │
+│ • 2-Step Architecture   │
+│ • SQLite Database       │
+└─────────────────────────┘
+           │
+           ↓
+    [Google Gemini AI]
+   (Search + Reasoning)
+            </pre>
+        </div>
+
+        <div class="problem-grid" style="margin-top: 2rem;">
+            <div class="problem-card">
+                <div class="icon">🎨</div>
+                <h3>Frontend Repository</h3>
+                <p>Chrome Extension for Netflix integration, UI/UX, and context collection</p>
+                <a href="https://github.com/tnfhrnsss/docentai" target="_blank" style="color: var(--accent-primary); text-decoration: none; display: block; margin-top: 1rem;">View Frontend Code →</a>
+            </div>
+
+            <div class="problem-card">
+                <div class="icon">🤖</div>
+                <h3>Backend Repository</h3>
+                <p>AI processing with Gemini 3, Search Grounding, and intelligent caching</p>
+                <a href="https://github.com/tnfhrnsss/docentai-core" target="_blank" style="color: var(--accent-primary); text-decoration: none; display: block; margin-top: 1rem;">View Backend Code →</a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; background: rgba(255, 215, 0, 0.1); border-radius: 12px;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                <strong>Why Split Architecture?</strong><br>
+                Separates user interaction (Frontend) from AI processing (Backend) for better scalability, security, and maintainability.
+            </p>
+        </div>
+    </section>
+
+    <!-- Installation -->
+    <section id="installation">
+        <div class="section-header">
+            <h2>Installation</h2>
+            <p>Manual installation for hackathon review and testing</p>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.3rem;">📋 Prerequisites</h3>
+                <ul style="color: var(--text-secondary); line-height: 1.8; margin-left: 1.5rem;">
+                    <li><strong>Chrome Browser</strong> (latest version recommended)</li>
+                    <li><strong>Backend Server</strong> - The API is already live on GCP (<a href="https://docentai-api-1064006289042.asia-northeast3.run.app/health" target="_blank" style="color: var(--accent-primary);">check status</a>)</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem;">🔧 Installation Steps</h3>
+
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <div style="background: var(--accent-primary); color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</div>
+                        <h4 style="margin: 0;">Clone the Repository</h4>
+                    </div>
+                    <pre style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; overflow-x: auto; margin-left: 3rem;"><code style="color: var(--text-secondary); font-family: 'Courier New', monospace;">git clone https://github.com/tnfhrnsss/docentai
+cd docentai</code></pre>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <div style="background: var(--accent-primary); color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</div>
+                        <h4 style="margin: 0;">Build the Extension (Dev Mode)</h4>
+                    </div>
+                    <pre style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; overflow-x: auto; margin-left: 3rem;"><code style="color: var(--text-secondary); font-family: 'Courier New', monospace;">python build.py --mode dev</code></pre>
+                    <p style="color: var(--text-secondary); margin-left: 3rem; margin-top: 0.5rem; font-size: 0.9rem;">
+                        <em>Note: Dev mode includes all features including screen capture</em>
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <div style="background: var(--accent-primary); color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</div>
+                        <h4 style="margin: 0;">Load in Chrome</h4>
+                    </div>
+                    <ul style="color: var(--text-secondary); line-height: 1.8; margin-left: 3rem;">
+                        <li>Navigate to <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px;">chrome://extensions/</code></li>
+                        <li>Enable <strong>"Developer mode"</strong> (toggle in top right)</li>
+                        <li>Click <strong>"Load unpacked"</strong></li>
+                        <li>Select the <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px;">build/extension/</code> folder</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <div style="background: var(--accent-primary); color: #000; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</div>
+                        <h4 style="margin: 0;">Start Using</h4>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-left: 3rem;">
+                        Visit <a href="https://www.netflix.com" target="_blank" style="color: var(--accent-primary);">Netflix</a>, play any video, and press <strong>Ctrl+E</strong> (or <strong>⌘+E</strong> on Mac)!
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; padding: 1.5rem; background: rgba(66, 133, 244, 0.1); border-radius: 12px;">
+                <p style="color: var(--text-secondary); font-size: 1rem;">
+                    <strong>🏪 Chrome Web Store Release</strong><br>
+                    Public release planned after hackathon review period.<br>
+                    One-click installation will be available soon!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Using DocentAI is simple</p>
+        </div>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Watch Netflix</h3>
+                <p>Play any video on Netflix. The 💡 button appears automatically.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Press Ctrl+E</h3>
+                <p>When you see confusing dialogue, press Ctrl+E (⌘+E on Mac) or click the 💡 button.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Get AI Explanation</h3>
+                <p>Receive instant, context-aware explanations powered by Google Gemini 3.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo">
+        <div class="section-header">
+            <h2>See It In Action</h2>
+            <p>Watch how DocentAI works</p>
+        </div>
+
+        <div class="demo-container">
+            <!-- TODO: Add demo video or GIF -->
+            <!-- Example: User clicking 💡 button → explanation panel appears → AI response shown -->
+            <div class="demo-placeholder">
+                <p style="font-size: 1.2rem; margin-bottom: 1rem;">📹 Demo Video</p>
+                <p>DocentAI demonstration video will be displayed here</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">(Add demo.mp4 or demo.gif)</p>
+            </div>
+        </div>
+
+        <!-- Screenshot Example -->
+        <div style="margin-top: 3rem;">
+            <h3 style="text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem;">Real Usage Example</h3>
+            <div class="demo-container">
+                <!-- TODO: Add actual usage screenshot -->
+                <!-- Example: Netflix screen with explanation panel open -->
+                <img src="assets/demo-problem.png" alt="DocentAI Usage Example" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+        <div class="section-header">
+            <h2>Key Features</h2>
+            <p>Powerful features DocentAI offers</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3>Floating Button</h3>
+                <p>Always visible 💡 button in the top-right corner for instant explanations.</p>
+                <!-- TODO: Screenshot - Netflix screen showing floating button -->
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📸</div>
+                <h3>Screen Capture Analysis</h3>
+                <p>Capture the current screen for AI to analyze the scene. Considers expressions, backgrounds, and situations for comprehensive explanations.</p>
+                <!-- TODO: Screenshot - Image attachment UI and multimodal analysis results -->
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Smart Caching</h3>
+                <p>Previously analyzed subtitles are cached for instant display. Average response time: 25ms.</p>
+                <!-- TODO: Screenshot - Cached response display (⚡ Cached indicator) -->
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>Related Scene Links</h3>
+                <p>Provides timestamp links to related previous scenes for easy navigation.</p>
+                <!-- TODO: Screenshot - Explanation panel showing related scene links -->
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>Multilingual Support</h3>
+                <p>Supports Korean and English, automatically switching based on browser language.</p>
+                <!-- TODO: Screenshot - English UI example -->
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⌨️</div>
+                <h3>Keyboard Shortcuts</h3>
+                <p>Press Ctrl+E (Windows) or ⌘+E (Mac) to quickly request explanations.</p>
+                <!-- TODO: Screenshot - Keyboard shortcut guide UI -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech">
+        <div class="section-header">
+            <h2>Tech Stack</h2>
+            <p>Technologies powering DocentAI</p>
+        </div>
+
+        <div class="tech-stack">
+            <div class="tech-badge">Google Gemini 3 Flash</div>
+            <div class="tech-badge">Search Grounding (Built-in)</div>
+            <div class="tech-badge">Function Calling</div>
+            <div class="tech-badge">2-Step Architecture</div>
+            <div class="tech-badge">Chrome Extension (Manifest V3)</div>
+            <div class="tech-badge">JavaScript (ES6+)</div>
+            <div class="tech-badge">Multimodal Analysis</div>
+            <div class="tech-badge">REST API</div>
+            <div class="tech-badge">Smart Caching</div>
+            <div class="tech-badge">i18n Support</div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq">
+        <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. Is DocentAI free?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Currently in development stage, the Chrome Extension is provided free of charge. Premium plans based on API usage may be added in the future.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. Does it support platforms other than Netflix?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Currently supports Netflix only, with plans to expand to YouTube, Disney+, Wavve, and more.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. Is my privacy protected?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    DocentAI only sends video metadata (title, episode, subtitle text) and does not collect user identification information. All data is transmitted encrypted.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. Is AI analysis always accurate?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Using Google Gemini 3 Flash provides high accuracy, but occasional errors may occur. We continuously improve through user feedback.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. Can I use it offline?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Internet connection is required for AI analysis. However, previously cached explanations can be viewed offline.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. How does the 2-step architecture work?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    <strong>Step 1 (Video Registration):</strong> When you start watching, DocentAI runs Search Grounding once to gather background knowledge about the show. Results are cached in the database.<br><br>
+                    <strong>Step 2 (Explanations):</strong> When you request explanations, the AI uses the cached references instead of searching again. This makes responses faster (25ms for cached) and more cost-effective.<br><br>
+                    This intelligent caching is why DocentAI can provide instant, contextual explanations without expensive repeated searches.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    Q. What makes this different from a simple AI wrapper?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    DocentAI is a <strong>full-stack AI application</strong>, not just a prompt wrapper:<br><br>
+                    • <strong>Search Grounding</strong> - Built-in web search for real-time knowledge<br>
+                    • <strong>Function Calling</strong> - AI decides which tools to use intelligently<br>
+                    • <strong>Multi-turn reasoning</strong> - Complex narrative understanding across episodes<br>
+                    • <strong>Knowledge graph</strong> - Character relationships and timeline tracking<br>
+                    • <strong>2-step architecture</strong> - Optimized for cost and performance<br>
+                    • <strong>Multimodal analysis</strong> - Text + image understanding<br><br>
+                    The backend (docentai-core) demonstrates advanced Gemini 3 capabilities in a production environment.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gemini 3 Hackathon Section -->
+    <section id="hackathon" style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1)); border-radius: 16px; padding: 3rem 2rem;">
+        <div class="section-header">
+            <h2>🏆 Built for Gemini 3 Hackathon</h2>
+            <p>Leveraging Google's latest AI capabilities</p>
+        </div>
+
+        <div class="features-grid" style="margin-top: 2rem;">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Search Grounding</h3>
+                <p><strong>Built-in web search</strong> powered by Gemini API - no separate Search API needed! Automatically gathers real-time knowledge about shows, characters, and plot details.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>2-Step Architecture</h3>
+                <p><strong>Cost-optimized design:</strong> Step 1 runs Search Grounding once per video and caches references. Step 2 uses cached data for fast, economical explanations.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>Function Calling</h3>
+                <p><strong>Intelligent tool use:</strong> Gemini decides when to search, query databases, or analyze timestamps. Multi-turn reasoning for complex narrative understanding.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🖼️</div>
+                <h3>Multimodal Analysis</h3>
+                <p><strong>Text + Image processing:</strong> Analyzes subtitles alongside screen captures to understand facial expressions, scene context, and visual cues.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Large Context Window</h3>
+                <p><strong>Entire episode context:</strong> Processes full conversation history and episode metadata to provide contextually rich explanations.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Knowledge Graph</h3>
+                <p><strong>Structured understanding:</strong> Builds character relationship maps and timeline tracking for coherent narrative explanations.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: var(--bg-secondary); border-radius: 12px; border: 2px solid var(--accent-primary);">
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">Why This Is NOT a Simple Prompt Wrapper</h3>
+            <div style="text-align: left; max-width: 800px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8;">
+                <p style="margin-bottom: 1rem;">❌ <strong>Simple wrapper:</strong> User clicks → Single Gemini call → Show response</p>
+
+                <p style="margin-bottom: 0.5rem;">✅ <strong>DocentAI:</strong> Multi-stage AI processing:</p>
+                <ul style="margin-left: 2rem; margin-bottom: 1rem;">
+                    <li><strong>Frontend:</strong> Gathers context (last 10 subtitles, metadata, optional image)</li>
+                    <li><strong>Backend:</strong> Multi-stage processing:
+                        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Knowledge graph lookup</li>
+                            <li><strong>Search Grounding</strong> for real-time web knowledge</li>
+                            <li><strong>Function Calling</strong> - Gemini decides which tools to use</li>
+                            <li>Multi-turn reasoning for complex narratives</li>
+                            <li>Timeline resolution and character relationship mapping</li>
+                        </ul>
+                    </li>
+                    <li><strong>Frontend:</strong> Renders rich explanation with clickable timeline references</li>
+                </ul>
+
+                <p><strong>Result:</strong> A production-ready, full-stack AI application that demonstrates advanced Gemini 3 capabilities.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="https://github.com/tnfhrnsss/docentai-core" target="_blank" class="btn btn-primary">
+                🤖 View AI Backend Code
+            </a>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="text-align: center; padding: 5rem 2rem; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 237, 78, 0.1)); border-radius: 16px; margin: 2rem;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Try It Now</h2>
+        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+            Available for manual installation and testing
+        </p>
+        <div class="cta-buttons">
+            <a href="#installation" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 2.5rem;">
+                📦 Installation Guide
+            </a>
+            <a href="https://github.com/tnfhrnsss/docentai" class="btn btn-secondary" style="font-size: 1.2rem; padding: 1.2rem 2.5rem;" target="_blank">
+                🔗 View on GitHub
+            </a>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-tertiary); margin-top: 1.5rem;">
+            🏪 Chrome Web Store release coming soon after hackathon review
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>DocentAI</h3>
+                <p style="color: var(--text-secondary);">
+                    AI assistant helping you understand Netflix subtitles easily
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Links</h3>
+                <a href="#installation">Installation</a>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#architecture">Architecture</a>
+                <a href="#hackathon">Gemini 3 Hackathon</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://github.com/tnfhrnsss/docentai" target="_blank">Frontend (GitHub)</a>
+                <a href="https://github.com/tnfhrnsss/docentai-core" target="_blank">Backend (GitHub)</a>
+            </div>
+
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#">Documentation</a>
+                <a href="#">API Reference</a>
+                <a href="#">Support</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <a href="mailto:contact@docentai.com">contact@docentai.com</a>
+                <a href="https://twitter.com/docentai" target="_blank">Twitter</a>
+                <a href="https://discord.gg/docentai" target="_blank">Discord</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 DocentAI. All rights reserved.</p>
+            <p style="margin-top: 0.5rem;">Made with 💡 for better viewing experience</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            html.setAttribute('data-theme', newTheme);
+            document.getElementById('theme-icon').textContent = newTheme === 'light' ? '☀️' : '🌙';
+
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-on-scroll');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isOpen = answer.style.display === 'block';
+
+                // Close all answers
+                document.querySelectorAll('.faq-answer').forEach(a => {
+                    a.style.display = 'none';
+                });
+
+                // Toggle current answer
+                answer.style.display = isOpen ? 'none' : 'block';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
