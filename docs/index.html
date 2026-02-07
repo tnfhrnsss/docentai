@@ -264,10 +264,16 @@
         <span class="section-label">Demo</span>
         <h2 class="section-title">See it in action</h2>
     </div>
-    <div class="demo-box reveal">
-        <div class="icon">📹</div>
-        <h4>Demo video coming soon</h4>
-        <p>A quick walkthrough of DocentAI in action</p>
+    <div class="demo-box reveal" style="padding: 0; border: none; background: transparent;">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--radius); box-shadow: var(--shadow);">
+            <iframe
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid var(--border); border-radius: var(--radius);"
+                src="https://www.youtube.com/embed/BUbfO1P8-Bs"
+                title="DocentAI Demo Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
     </div>
 </section>
 
@@ -307,6 +313,34 @@
             <span class="icon">✅</span>
             <p><strong>Backend is already live</strong> on GCP — no server setup needed. Just install the extension. (<a href="https://docentai-api-1064006289042.asia-northeast3.run.app/health" target="_blank">Check API status</a>)</p>
         </div>
+
+        <div style="background: var(--accent-soft); border-radius: 9px; padding: 1rem 1.2rem; margin-bottom: 1.2rem;">
+            <h3 style="font-size: .85rem; font-weight: 700; color: var(--accent); margin-bottom: .4rem;">📦 Option 1: Download Pre-built (Recommended)</h3>
+            <p style="font-size: .72rem; color: var(--text-secondary); margin-bottom: 0;">Easiest way to get started — no build required.</p>
+        </div>
+
+        <div class="inst-step">
+            <span class="inst-num">1</span>
+            <div><h4>Download the release</h4><p>Go to <a href="https://github.com/tnfhrnsss/docentai/releases/tag/1.0.0" target="_blank" style="color: var(--accent); font-weight: 600; text-decoration: none;">GitHub Releases</a> and download <span class="tag">docentai-ui-dev-v1.0.0.zip</span></p></div>
+        </div>
+        <div class="inst-step">
+            <span class="inst-num">2</span>
+            <div><h4>Extract the zip file</h4><p>Unzip the downloaded file to a folder on your computer.</p></div>
+        </div>
+        <div class="inst-step">
+            <span class="inst-num">3</span>
+            <div><h4>Load in Chrome</h4><p>Go to <span class="tag">chrome://extensions/</span> → Enable <strong>Developer mode</strong> → Click <strong>Load unpacked</strong> → Select the extracted folder</p></div>
+        </div>
+        <div class="inst-step">
+            <span class="inst-num">4</span>
+            <div><h4>Start watching!</h4><p>Open Netflix, play anything, and press <strong>Ctrl+E</strong> (⌘+E on Mac). That's it 🎉</p></div>
+        </div>
+
+        <div style="background: var(--off-white); border-radius: 9px; padding: 1rem 1.2rem; margin-top: 1.8rem; margin-bottom: 1.2rem;">
+            <h3 style="font-size: .85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: .4rem;">🛠️ Option 2: Build from Source</h3>
+            <p style="font-size: .72rem; color: var(--text-secondary); margin-bottom: 0;">For developers who want to customize or contribute.</p>
+        </div>
+
         <div class="inst-step">
             <span class="inst-num">1</span>
             <div><h4>Clone the repo</h4><div class="code-snip"><code><span class="dim"># Terminal</span>
@@ -374,7 +408,6 @@ cd docentai</code></div></div>
         <div class="faq-item"><button class="faq-q" onclick="faq(this)">Is my data private? <span class="faq-arrow">▼</span></button><div class="faq-a">Absolutely. No names, emails, or browsing history are collected. Only video metadata (title, episode number) and subtitle text are sent — everything encrypted in transit.</div></div>
         <div class="faq-item"><button class="faq-q" onclick="faq(this)">How accurate is it? <span class="faq-arrow">▼</span></button><div class="faq-a">Gemini 3 + Search Grounding pulls in real reference data, so accuracy is high. Occasional misses are possible — we keep improving based on feedback.</div></div>
         <div class="faq-item"><button class="faq-q" onclick="faq(this)">Offline support? <span class="faq-arrow">▼</span></button><div class="faq-a">Internet is needed for new queries, but previously cached explanations are available offline.</div></div>
-        <div class="faq-item"><button class="faq-q" onclick="faq(this)">Isn't this the same as Language Reactor? <span class="faq-arrow">▼</span></button><div class="faq-a">Nope — Language Reactor teaches you language (vocabulary, grammar). DocentAI helps you understand the story. "What does this word mean?" vs. "Who is this character and why does this scene matter?" Think dictionary vs. docent.</div></div>
         <div class="faq-item"><button class="faq-q" onclick="faq(this)">Why two separate repos? <span class="faq-arrow">▼</span></button><div class="faq-a">Clean separation of UI and AI. The backend uses a smart 2-step process: Search Grounding runs once when you start a video (cached), then each explanation reuses those references — keeping it fast and cost-efficient.</div></div>
     </div>
 </section>
