@@ -16,7 +16,7 @@ DocentAI is your AI guide through Netflix narratives — understanding context a
 
 > **🚧 Installation Status:** Currently available via manual installation for testing and hackathon review. Chrome Web Store release planned after hackathon review period.
 
-[🚀 Quick Start](#-quick-start) • [🔧 Installation](#-installation) • [🏗️ Architecture](#️-architecture) • [🏆 Hackathon](#-built-for-gemini-3-hackathon)
+[🚀 Quick Start](#-quick-start) • [🔧 Installation](#installation) • [🏗️ Architecture](#architecture)
 
 </div>
 
@@ -120,7 +120,33 @@ See DocentAI in action — how it works on Netflix, keyboard shortcuts, and AI e
 
 **2. Chrome Browser** (latest version recommended)
 
-### Installation (Manual - Dev Mode)
+### Installation
+
+#### 📦 Option 1: Download Pre-built Release (Recommended)
+
+**Easiest way to get started — no build required!**
+
+1. **Download the release**
+   - Go to [GitHub Releases](https://github.com/tnfhrnsss/docentai/releases/tag/1.0.0)
+   - Download `docentai-ui-dev-v1.0.0.zip`
+
+2. **Extract the ZIP file**
+   - Unzip the downloaded file to a folder on your computer
+
+3. **Load in Chrome**
+   - Navigate to `chrome://extensions/`
+   - Enable **Developer mode** (top right toggle)
+   - Click **Load unpacked**
+   - Select the extracted folder
+
+4. **Start watching!**
+   - Visit Netflix, play anything, and press **Ctrl+E** (⌘+E on Mac) 🎉
+
+---
+
+#### 🛠️ Option 2: Build from Source
+
+**For developers who want to customize or contribute.**
 
 ```bash
 # 1. Clone this repository
@@ -139,6 +165,8 @@ python build.py --mode dev
 # 4. Visit Netflix and press Ctrl+E!
 ```
 
+---
+
 ### Chrome Web Store Release
 
 🏪 **Coming Soon** - Public release planned after hackathon review period. One-click installation will be available!
@@ -153,20 +181,11 @@ If using local backend, update the API endpoint:
 const CONFIG = {
   // Development (local backend)
   API_BASE_URL: 'http://localhost:7777',
-  
+
   // Production (GCP) - Default
   // API_BASE_URL: 'https://docentai-api-1064006289042.asia-northeast3.run.app'
 };
 ```
-
-<details>
-<summary>📦 Alternative: Install from ZIP</summary>
-
-1. Download `build/docentai-ui-dev-v1.0.0.zip` from releases
-2. Extract the ZIP file
-3. Load unpacked extension (same as step 3 above)
-
-</details>
 
 ---
 
@@ -198,7 +217,7 @@ When the action panel appears:
 
 ---
 
-## System Architecture
+## Architecture
 
 ### Full DocentAI System
 
