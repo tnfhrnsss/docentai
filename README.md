@@ -100,9 +100,13 @@ Just **press `Ctrl+E`** when you see confusing dialogue:
 
 ---
 
-## 🎬 Video Demo (to-do)
+## 🎬 Video Demo
 
-Coming soon! For now, check out the screenshots below and try the manual installation.
+[![DocentAI Demo Video](https://img.youtube.com/vi/BUbfO1P8-Bs/maxresdefault.jpg)](https://youtu.be/BUbfO1P8-Bs)
+
+**👉 [Watch on YouTube](https://youtu.be/BUbfO1P8-Bs)**
+
+See DocentAI in action — how it works on Netflix, keyboard shortcuts, and AI explanations with multimodal analysis.
 
 ---
 
