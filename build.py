@@ -64,10 +64,7 @@ def generate_config(mode, build_dir):
         template = f.read()
 
     # API URL 설정
-    if mode == 'dev':
-        api_url = 'http://localhost:8001'
-    else:
-        api_url = 'https://docentai-api-1064006289042.asia-northeast3.run.app'
+    api_url = 'https://docentai-api-1064006289042.asia-northeast3.run.app'
 
     # 플레이스홀더 치환
     config_content = template.replace('{{API_URL}}', api_url)
