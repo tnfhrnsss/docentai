@@ -406,10 +406,20 @@ async function boot() {
   // watch 페이지가 아니면 종료
   if (!location.pathname.startsWith('/watch/')) {
 
-    // watch 페이지를 벗어나면 플로팅 버튼 제거
-    if (ui && ui.floatingButton) {
-      ui.floatingButton.remove();
-      ui.floatingButton = null;
+    // watch 페이지를 벗어나면 모든 UI 제거
+    if (ui) {
+      // 플로팅 버튼 제거
+      if (ui.floatingButton) {
+        ui.floatingButton.remove();
+        ui.floatingButton = null;
+      }
+
+      // 설명 패널 제거
+      ui.removeExplanationPanel();
+
+      // 액션 패널 제거
+      ui.removeActionPanel();
+
       isVideoPageInitialized = false;
     }
     return;
